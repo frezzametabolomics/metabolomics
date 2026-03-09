@@ -76,6 +76,23 @@
   }
   .nav-links a:hover { color: var(--accent); }
 
+  .nav-hamburger {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+  }
+  .nav-hamburger span {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: var(--accent);
+    transition: all 0.3s;
+  }
+
   /* ── HERO ── */
   .hero {
     position: relative;
@@ -450,7 +467,22 @@
 
   /* ── RESPONSIVE ── */
   @media (max-width: 768px) {
-    nav { padding: 1rem 1.5rem; }
+    nav { padding: 1rem 1.5rem; position: fixed; flex-wrap: wrap; }
+    .nav-hamburger { display: flex; }
+    .nav-links {
+      display: none;
+      flex-direction: column;
+      gap: 0;
+      width: 100%;
+      background: rgba(5,13,26,0.97);
+      border-top: 1px solid var(--border);
+      margin: 0.5rem -1.5rem -1rem;
+      padding: 0.5rem 0;
+    }
+    .nav-links.open { display: flex; }
+    .nav-links li { border-bottom: 1px solid var(--border); }
+    .nav-links li:last-child { border-bottom: none; }
+    .nav-links a { display: block; padding: 0.75rem 1.5rem; font-size: 0.85rem; }
     .hero { padding: 8rem 1.5rem 4rem; }
     section { padding: 4rem 1.5rem; }
     .instruments-strip { flex-direction: column; }
@@ -468,8 +500,11 @@
 <canvas id="mol"></canvas>
 
 <!-- NAV -->
-<nav>
+<nav id="main-nav">
   <a class="nav-brand" href="index.html">Metabolomics · UCöln</a>
+  <button class="nav-hamburger" aria-label="Toggle menu" onclick="document.querySelector('.nav-links').classList.toggle('open')">
+    <span></span><span></span><span></span>
+  </button>
   <ul class="nav-links">
     <li><a href="#about">About</a></li>
     <li><a href="#instruments">Instruments</a></li>
@@ -720,6 +755,11 @@ const io = new IntersectionObserver(entries => {
 }, { threshold: 0.12 });
 
 document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+/* ── Close mobile menu when a nav link is clicked ── */
+document.querySelectorAll('.nav-links a').forEach(a => {
+  a.addEventListener('click', () => document.querySelector('.nav-links').classList.remove('open'));
+});
 </script>
 </body>
 </html>
