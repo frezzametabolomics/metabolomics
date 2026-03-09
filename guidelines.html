@@ -161,16 +161,16 @@
     position: relative;
     z-index: 1;
     display: flex;
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
-    padding: 5rem 4rem;
-    gap: 4rem;
+    padding: 5rem 5rem;
+    gap: 5rem;
     align-items: flex-start;
   }
 
   /* ── TOC ── */
   .toc {
-    width: 220px;
+    width: 240px;
     flex-shrink: 0;
     position: sticky;
     top: 6rem;
@@ -178,7 +178,7 @@
 
   .toc-label {
     font-family: 'DM Mono', monospace;
-    font-size: 0.62rem;
+    font-size: 0.65rem;
     letter-spacing: 0.22em;
     text-transform: uppercase;
     color: var(--muted);
@@ -190,13 +190,13 @@
 
   .toc a {
     display: block;
-    padding: 0.45rem 0.8rem;
-    font-size: 0.8rem;
+    padding: 0.55rem 1rem;
+    font-size: 0.85rem;
     color: var(--muted);
     text-decoration: none;
     border-left: 1px solid var(--border);
     transition: color 0.2s, border-color 0.2s, background 0.2s;
-    line-height: 1.4;
+    line-height: 1.5;
   }
   .toc a:hover {
     color: var(--accent);
@@ -215,8 +215,8 @@
   }
 
   .guideline-section {
-    margin-bottom: 4rem;
-    padding-bottom: 4rem;
+    margin-bottom: 5rem;
+    padding-bottom: 5rem;
     border-bottom: 1px solid var(--border);
   }
   .guideline-section:last-child {
@@ -246,26 +246,26 @@
   .guideline-section h2 {
     font-family: 'Cormorant Garamond', serif;
     font-weight: 300;
-    font-size: clamp(1.5rem, 2.5vw, 2.2rem);
+    font-size: clamp(1.8rem, 3vw, 2.8rem);
     color: var(--white);
     line-height: 1.2;
-    margin-bottom: 1.2rem;
+    margin-bottom: 1.4rem;
   }
 
   .guideline-section h3 {
     font-family: 'Outfit', sans-serif;
-    font-size: 0.9rem;
+    font-size: 1rem;
     font-weight: 500;
     color: var(--white);
-    margin: 2rem 0 0.6rem;
+    margin: 2.4rem 0 0.8rem;
     letter-spacing: 0.04em;
   }
 
   .guideline-section p {
-    font-size: 0.92rem;
+    font-size: 1rem;
     color: var(--muted);
-    line-height: 1.8;
-    margin-bottom: 1rem;
+    line-height: 1.85;
+    margin-bottom: 1.1rem;
   }
 
   .guideline-section ul,
@@ -274,10 +274,10 @@
   }
 
   .guideline-section li {
-    font-size: 0.9rem;
+    font-size: 0.97rem;
     color: var(--muted);
-    line-height: 1.7;
-    margin-bottom: 0.4rem;
+    line-height: 1.75;
+    margin-bottom: 0.5rem;
   }
 
   .guideline-section strong {
@@ -456,7 +456,7 @@
 
 <!-- NAV -->
 <nav id="main-nav">
-  <a class="nav-brand" href="index.html">Metabolomics · UCöln</a>
+  <a class="nav-brand" href="index.html">Metabolomics Core Facility</a>
   <button class="nav-hamburger" aria-label="Toggle menu" onclick="document.querySelector('.nav-links').classList.toggle('open')">
     <span></span><span></span><span></span>
   </button>
