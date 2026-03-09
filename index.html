@@ -766,6 +766,17 @@
   <!-- PI Block -->
   <div style="display:grid;grid-template-columns:1fr 2fr;gap:3rem;margin-top:3rem;padding:2.5rem;border:1px solid var(--border);background:var(--surface);" class="reveal">
     <div>
+      <!--
+        TO ADD A PORTRAIT PHOTO:
+        1. Copy your image file into the images/ folder (e.g. images/christian-frezza.jpg)
+        2. Replace the placeholder div below with:
+           <img src="images/christian-frezza.jpg" alt="Prof. Dr. Christian Frezza"
+                style="width:100%;aspect-ratio:1/1;object-fit:cover;object-position:top;display:block;margin-bottom:1.5rem;filter:grayscale(15%);">
+      -->
+      <div style="width:100%;aspect-ratio:1/1;background:#0a0a0a;border:1px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.6rem;margin-bottom:1.5rem;">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="1"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+        <span style="font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.15em;text-transform:uppercase;color:#333;">images/christian-frezza.jpg</span>
+      </div>
       <p style="font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--accent);margin-bottom:0.6rem;">Group Leader</p>
       <p style="font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:400;color:var(--white);margin-bottom:0.4rem;">Prof. Dr.<br>Christian Frezza</p>
       <p style="font-size:0.82rem;color:var(--muted);line-height:1.6;">Alexander von Humboldt Professor of Metabolomics in Ageing</p>
