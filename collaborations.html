@@ -1,44 +1,542 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Collaborations | University Metabolomics Group</title>
-  <style>
-    /* Same basic styling as index.html for consistency */
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: Arial, sans-serif; background: #f4f4f4; color: #333; line-height: 1.6; }
-    header { background: #333; color: #fff; padding: 20px 0; text-align: center; }
-    nav { background: #444; }
-    nav ul { display: flex; justify-content: center; list-style: none; }
-    nav ul li { margin: 0 15px; }
-    nav ul li a { color: #fff; text-decoration: none; padding: 10px; display: block; }
-    nav ul li a:hover { background: #555; }
-    section { max-width: 960px; margin: 20px auto; background: #fff; padding: 20px; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-    footer { background: #333; color: #fff; text-align: center; padding: 10px 0; margin-top: 20px; }
-    h1, h2 { margin-bottom: 15px; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Collaborations · Metabolomics Core Facility · University of Cologne</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=DM+Mono:wght@300;400&family=Outfit:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:       #050d1a;
+    --bg2:      #091527;
+    --surface:  #0d1e33;
+    --border:   #1a3050;
+    --accent:   #00c9a7;
+    --accent2:  #4dabf7;
+    --gold:     #c9a84c;
+    --text:     #d4e3f5;
+    --muted:    #607d9b;
+    --white:    #eef4ff;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Outfit', sans-serif;
+    font-weight: 300;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  canvas#mol {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    opacity: 0.18;
+    pointer-events: none;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.2rem 4rem;
+    background: rgba(5,13,26,0.85);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-brand {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.18em;
+    color: var(--accent);
+    text-transform: uppercase;
+    text-decoration: none;
+  }
+
+  .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+  .nav-links a {
+    text-decoration: none;
+    font-size: 0.82rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    transition: color 0.2s;
+  }
+  .nav-links a:hover,
+  .nav-links a.active { color: var(--accent); }
+
+  /* ── PAGE HEADER ── */
+  .page-header {
+    position: relative;
+    z-index: 1;
+    padding: 12rem 4rem 5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .page-header .eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.22em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 1.4rem;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.2s forwards;
+  }
+
+  .page-header h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-size: clamp(2.8rem, 6vw, 5.5rem);
+    line-height: 1.05;
+    color: var(--white);
+    max-width: 14ch;
+    opacity: 0;
+    animation: fadeUp 0.9s 0.4s forwards;
+  }
+
+  .page-header h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .page-header .sub {
+    margin-top: 1.6rem;
+    max-width: 52ch;
+    font-size: 1rem;
+    color: var(--muted);
+    opacity: 0;
+    animation: fadeUp 0.9s 0.6s forwards;
+  }
+
+  /* ── SECTIONS ── */
+  .content-wrap {
+    position: relative;
+    z-index: 1;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 5rem 4rem;
+  }
+
+  .section-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+  .section-tag::after {
+    content: '';
+    flex: 1;
+    max-width: 60px;
+    height: 1px;
+    background: var(--accent);
+    opacity: 0.4;
+  }
+
+  h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+    color: var(--white);
+    line-height: 1.2;
+    margin-bottom: 2rem;
+  }
+
+  /* ── COLLAB PROCESS ── */
+  .process-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin-top: 3rem;
+  }
+
+  .process-item {
+    background: var(--bg);
+    padding: 2.2rem;
+    transition: background 0.25s;
+    position: relative;
+    overflow: hidden;
+  }
+  .process-item:hover { background: var(--surface); }
+  .process-item::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .process-item:hover::before { opacity: 1; }
+
+  .process-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.18em;
+    color: var(--accent);
+    opacity: 0.6;
+    margin-bottom: 0.8rem;
+  }
+
+  .process-title {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--white);
+    margin-bottom: 0.5rem;
+  }
+
+  .process-desc {
+    font-size: 0.84rem;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  /* ── TYPES OF COLLAB ── */
+  .collab-types {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-top: 3rem;
+  }
+
+  .collab-card {
+    padding: 2.5rem;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s;
+  }
+  .collab-card:hover { border-color: var(--accent); }
+
+  .collab-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .collab-card:hover::after { opacity: 1; }
+
+  .collab-icon {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+    display: block;
+  }
+
+  .collab-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.4rem;
+    font-weight: 400;
+    color: var(--white);
+    margin-bottom: 0.8rem;
+  }
+
+  .collab-desc {
+    font-size: 0.88rem;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  /* ── CTA BLOCK ── */
+  .cta-block {
+    margin-top: 5rem;
+    padding: 4rem;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 3rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cta-block::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+  }
+
+  .cta-text h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-size: 2rem;
+    color: var(--white);
+    margin-bottom: 0.6rem;
+  }
+
+  .cta-text p {
+    font-size: 0.92rem;
+    color: var(--muted);
+    max-width: 44ch;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 2rem;
+    border-radius: 2px;
+    font-size: 0.82rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-decoration: none;
+    cursor: pointer;
+    border: none;
+    transition: all 0.25s;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #020d18;
+    font-weight: 500;
+  }
+  .btn-primary:hover { background: #00e6be; transform: translateY(-1px); }
+
+  .btn-ghost {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ── FOOTER ── */
+  footer {
+    position: relative;
+    z-index: 1;
+    border-top: 1px solid var(--border);
+    padding: 2.5rem 4rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.8s, transform 0.8s;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    nav { padding: 1rem 1.5rem; }
+    .nav-links { gap: 1.2rem; }
+    .page-header { padding: 8rem 1.5rem 4rem; }
+    .content-wrap { padding: 4rem 1.5rem; }
+    .collab-types { grid-template-columns: 1fr; }
+    .cta-block { flex-direction: column; padding: 2.5rem 1.5rem; }
+    footer { flex-direction: column; gap: 1rem; text-align: center; }
+  }
+</style>
 </head>
 <body>
-  <header>
-    <h1>Collaborations</h1>
-  </header>
-  
-  <nav>
-    <ul>
-      <li><a href="index.html">Home</a></li>
-      <li><a href="collaborations.html">Collaborations</a></li>
-      <li><a href="sample-submission.html">Sample Submission</a></li>
-    </ul>
-  </nav>
-  
-  <section>
-    <h2>Have an Idea for a Collaboration?</h2>
-    <p>We welcome ideas for joint research and collaborative projects! If you have an idea for a collaboration, please send your request for a meeting to <a href="mailto:abc@uni-koeln.de">abc@uni-koeln.de</a>. Request a meeting with Prof. Christian Frezza and our team, and we will get back to you with available dates.</p>
-  </section>
-  
-  <footer>
-    <p>&copy; 2025 University Metabolomics Group. All Rights Reserved.</p>
-  </footer>
+
+<canvas id="mol"></canvas>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-brand" href="index.html">Metabolomics · UCöln</a>
+  <ul class="nav-links">
+    <li><a href="index.html#about">About</a></li>
+    <li><a href="index.html#instruments">Instruments</a></li>
+    <li><a href="index.html#services">Services</a></li>
+    <li><a href="index.html#workflow">Workflow</a></li>
+    <li><a href="index.html#contact">Contact</a></li>
+    <li><a href="collaborations.html" class="active">Collaborations</a></li>
+    <li><a href="guidelines.html">Guidelines</a></li>
+  </ul>
+</nav>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <p class="eyebrow">Metabolomics Core Facility · University of Cologne</p>
+  <h1>Research<br><em>collaborations</em></h1>
+  <p class="sub">
+    We partner with research groups across disciplines to generate metabolomics data that drives discovery. Let's work together.
+  </p>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="content-wrap">
+
+  <!-- HOW IT WORKS -->
+  <p class="section-tag reveal">How it works</p>
+  <h2 class="reveal">From idea to<br>published results</h2>
+
+  <div class="process-grid reveal">
+    <div class="process-item">
+      <p class="process-num">01</p>
+      <p class="process-title">Initial Inquiry</p>
+      <p class="process-desc">Send a brief project summary to <a href="mailto:abc@uni-koeln.de" style="color:var(--accent);text-decoration:none;">abc@uni-koeln.de</a>. Include background, aims, and any preliminary data.</p>
+    </div>
+    <div class="process-item">
+      <p class="process-num">02</p>
+      <p class="process-title">Consultation Meeting</p>
+      <p class="process-desc">We schedule a meeting with Prof. Christian Frezza and the team to discuss experimental strategy, sample requirements, and timelines.</p>
+    </div>
+    <div class="process-item">
+      <p class="process-num">03</p>
+      <p class="process-title">Experiment & Analysis</p>
+      <p class="process-desc">Sample acquisition, QC-controlled runs, data processing, and biological interpretation — all performed collaboratively.</p>
+    </div>
+    <div class="process-item">
+      <p class="process-num">04</p>
+      <p class="process-title">Publication Support</p>
+      <p class="process-desc">Data deposition (MetaboLights / Metabolomics Workbench), figure preparation, and co-authorship where appropriate.</p>
+    </div>
+  </div>
+
+  <!-- TYPES OF COLLABORATION -->
+  <p class="section-tag reveal" style="margin-top:5rem;">Collaboration types</p>
+  <h2 class="reveal">Who we work with</h2>
+
+  <div class="collab-types reveal">
+    <div class="collab-card">
+      <span class="collab-icon">🏛️</span>
+      <p class="collab-title">Internal (UzK)</p>
+      <p class="collab-desc">University of Cologne researchers benefit from priority access and subsidised rates. We actively seek projects where metabolomics can complement your existing experimental pipeline.</p>
+    </div>
+    <div class="collab-card">
+      <span class="collab-icon">🔬</span>
+      <p class="collab-title">DFG & Funded Projects</p>
+      <p class="collab-desc">We participate as co-investigators in DFG, BMBF, and EU-funded projects. Core facility costs can be included in grant budgets — contact us early in the application process.</p>
+    </div>
+    <div class="collab-card">
+      <span class="collab-icon">🌍</span>
+      <p class="collab-title">External Academic</p>
+      <p class="collab-desc">External academic institutions are welcome. We offer full-service collaborations including experimental design, acquisition, bioinformatics, and manuscript support.</p>
+    </div>
+    <div class="collab-card">
+      <span class="collab-icon">⚗️</span>
+      <p class="collab-title">Method Development</p>
+      <p class="collab-desc">Interested in developing new metabolomics workflows? We are open to long-term method development partnerships for novel sample types or metabolite classes.</p>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-block reveal">
+    <div class="cta-text">
+      <h3>Have a project in mind?</h3>
+      <p>Request a meeting with Prof. Christian Frezza and the team. We respond to all inquiries within two business days.</p>
+    </div>
+    <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+      <a href="mailto:abc@uni-koeln.de" class="btn btn-primary">Request a Meeting →</a>
+      <a href="guidelines.html" class="btn btn-ghost">Read Guidelines</a>
+    </div>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <span>© 2025 University Metabolomics Group · University of Cologne</span>
+  <span>Polar HILIC · Orbitrap Exploris 120 & 240</span>
+</footer>
+
+<script>
+/* ── Molecular network background ── */
+const canvas = document.getElementById('mol');
+const ctx = canvas.getContext('2d');
+let W, H, nodes;
+
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+
+function init() {
+  resize();
+  nodes = Array.from({ length: 60 }, () => ({
+    x: Math.random() * W,
+    y: Math.random() * H,
+    vx: (Math.random() - 0.5) * 0.3,
+    vy: (Math.random() - 0.5) * 0.3,
+    r: Math.random() * 2.5 + 1,
+  }));
+}
+
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+  for (let i = 0; i < nodes.length; i++) {
+    for (let j = i + 1; j < nodes.length; j++) {
+      const dx = nodes[i].x - nodes[j].x;
+      const dy = nodes[i].y - nodes[j].y;
+      const d = Math.sqrt(dx * dx + dy * dy);
+      if (d < 130) {
+        ctx.beginPath();
+        ctx.moveTo(nodes[i].x, nodes[i].y);
+        ctx.lineTo(nodes[j].x, nodes[j].y);
+        ctx.strokeStyle = `rgba(0,201,167,${(1 - d / 130) * 0.5})`;
+        ctx.lineWidth = 0.5;
+        ctx.stroke();
+      }
+    }
+  }
+  nodes.forEach(n => {
+    ctx.beginPath();
+    ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(77,171,247,0.6)';
+    ctx.fill();
+    n.x += n.vx;
+    n.y += n.vy;
+    if (n.x < 0 || n.x > W) n.vx *= -1;
+    if (n.y < 0 || n.y > H) n.vy *= -1;
+  });
+  requestAnimationFrame(draw);
+}
+
+window.addEventListener('resize', () => { resize(); });
+init();
+draw();
+
+/* ── Scroll reveal ── */
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) e.target.classList.add('visible');
+  });
+}, { threshold: 0.12 });
+
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+</script>
 </body>
 </html>
