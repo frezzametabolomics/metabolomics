@@ -1,416 +1,809 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Frezza Lab Metabolomics Guidelines | University Metabolomics Group</title>
-  <style>
-    /* Reset and Base Styles */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      scroll-behavior: smooth;
-    }
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f4f4;
-      color: #333;
-      line-height: 1.6;
-    }
-    header {
-      background: #333;
-      color: #fff;
-      padding: 20px 10px;
-      text-align: center;
-    }
-    nav.main-nav {
-      background: #444;
-      border-radius: 4px;
-    }
-    nav.main-nav ul {
-      display: flex;
-      justify-content: center;
-      list-style: none;
-    }
-    nav.main-nav li {
-      margin: 0 15px;
-    }
-    nav.main-nav a {
-      color: #fff;
-      text-decoration: none;
-      padding: 10px;
-      display: block;
-    }
-    nav.main-nav a:hover {
-      background: #555;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guidelines · Metabolomics Core Facility · University of Cologne</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=DM+Mono:wght@300;400&family=Outfit:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    /* Container for TOC + Main Content */
-    .guidelines-container {
-      display: flex;
-      max-width: 12000px;
-      margin: 20px auto;
-      padding: 0 20px;
-      gap: 20px;
-    }
+  :root {
+    --bg:       #050d1a;
+    --bg2:      #091527;
+    --surface:  #0d1e33;
+    --border:   #1a3050;
+    --accent:   #00c9a7;
+    --accent2:  #4dabf7;
+    --gold:     #c9a84c;
+    --text:     #d4e3f5;
+    --muted:    #607d9b;
+    --white:    #eef4ff;
+  }
 
-    /* Sticky TOC on the left */
-    aside.toc {
-      width: 250px;
-      background: #eee;
-      border-radius: 4px;
-      padding: 15px;
-      position: sticky;
-      top: 100px;
-      height: fit-content;
-      align-self: flex-start;
-    }
-    aside.toc h2 {
-      font-size: 1.2em;
-      margin-bottom: 10px;
-    }
-    aside.toc ul {
-      list-style: none;
-    }
-    aside.toc li {
-      margin: 8px 0;
-    }
-    aside.toc a {
-      text-decoration: none;
-      color: #0066cc;
-    }
-    aside.toc a:hover {
-      text-decoration: underline;
-    }
+  html { scroll-behavior: smooth; }
 
-    /* Main Content */
-    main.content {
-      flex: 1;
-      background: #fff;
-      padding: 20px;
-      border-radius: 4px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Outfit', sans-serif;
+    font-weight: 300;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
 
-    footer {
-      background: #333;
-      color: #fff;
-      text-align: center;
-      padding: 10px;
-      margin-top: 20px;
-    }
+  canvas#mol {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    opacity: 0.18;
+    pointer-events: none;
+  }
 
-    /* Headings & Text */
-    h1 {
-      margin-bottom: 15px;
-    }
-    h2 {
-      margin: 20px 0 10px;
-      border-bottom: 1px solid #ddd;
-      padding-bottom: 5px;
-    }
-    h3 {
-      margin: 15px 0 10px;
-    }
-    p, li {
-      margin-bottom: 10px;
-    }
-    ul {
-      margin-left: 20px;
-    }
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.2rem 4rem;
+    background: rgba(5,13,26,0.85);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border);
+  }
 
-    /* Responsive: stack columns on narrow screens */
-    @media (max-width: 768px) {
-      .guidelines-container {
-        flex-direction: column;
-      }
-      aside.toc, main.content {
-        width: 100%;
-        margin: 0;
-        position: static;
-      }
-    }
+  .nav-brand {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.18em;
+    color: var(--accent);
+    text-transform: uppercase;
+    text-decoration: none;
+  }
 
-    /* "Up" Button Styles */
-    #upButton {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: #0066cc;
-      color: #fff;
-      border: none;
-      padding: 10px 15px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 14px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-      opacity: 0.7;
-      transition: opacity 0.3s ease;
-      display: none; /* Hidden by default */
-    }
-    #upButton:hover {
-      opacity: 1;
-    }
-  </style>
+  .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+  .nav-links a {
+    text-decoration: none;
+    font-size: 0.82rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    transition: color 0.2s;
+  }
+  .nav-links a:hover,
+  .nav-links a.active { color: var(--accent); }
+
+  /* ── PAGE HEADER ── */
+  .page-header {
+    position: relative;
+    z-index: 1;
+    padding: 12rem 4rem 5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .page-header .eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.22em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 1.4rem;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.2s forwards;
+  }
+
+  .page-header h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-size: clamp(2.8rem, 6vw, 5.5rem);
+    line-height: 1.05;
+    color: var(--white);
+    max-width: 16ch;
+    opacity: 0;
+    animation: fadeUp 0.9s 0.4s forwards;
+  }
+
+  .page-header h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .page-header .sub {
+    margin-top: 1.6rem;
+    max-width: 52ch;
+    font-size: 1rem;
+    color: var(--muted);
+    opacity: 0;
+    animation: fadeUp 0.9s 0.6s forwards;
+  }
+
+  .version-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1.8rem;
+    padding: 0.4rem 1rem;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    text-transform: uppercase;
+    opacity: 0;
+    animation: fadeUp 0.9s 0.7s forwards;
+  }
+
+  .version-badge span { color: var(--accent); }
+
+  /* ── LAYOUT ── */
+  .guidelines-layout {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 5rem 4rem;
+    gap: 4rem;
+    align-items: flex-start;
+  }
+
+  /* ── TOC ── */
+  .toc {
+    width: 220px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 6rem;
+  }
+
+  .toc-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 1.2rem;
+  }
+
+  .toc ul { list-style: none; }
+  .toc li { margin: 0; }
+
+  .toc a {
+    display: block;
+    padding: 0.45rem 0.8rem;
+    font-size: 0.8rem;
+    color: var(--muted);
+    text-decoration: none;
+    border-left: 1px solid var(--border);
+    transition: color 0.2s, border-color 0.2s, background 0.2s;
+    line-height: 1.4;
+  }
+  .toc a:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+    background: rgba(0,201,167,0.04);
+  }
+  .toc a.active {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+
+  /* ── MAIN CONTENT ── */
+  .guidelines-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .guideline-section {
+    margin-bottom: 4rem;
+    padding-bottom: 4rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .guideline-section:last-child {
+    border-bottom: none;
+  }
+
+  .section-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+  .section-tag::after {
+    content: '';
+    flex: 1;
+    max-width: 50px;
+    height: 1px;
+    background: var(--accent);
+    opacity: 0.4;
+  }
+
+  .guideline-section h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-size: clamp(1.5rem, 2.5vw, 2.2rem);
+    color: var(--white);
+    line-height: 1.2;
+    margin-bottom: 1.2rem;
+  }
+
+  .guideline-section h3 {
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--white);
+    margin: 2rem 0 0.6rem;
+    letter-spacing: 0.04em;
+  }
+
+  .guideline-section p {
+    font-size: 0.92rem;
+    color: var(--muted);
+    line-height: 1.8;
+    margin-bottom: 1rem;
+  }
+
+  .guideline-section ul,
+  .guideline-section ol {
+    margin: 0.8rem 0 1rem 1.4rem;
+  }
+
+  .guideline-section li {
+    font-size: 0.9rem;
+    color: var(--muted);
+    line-height: 1.7;
+    margin-bottom: 0.4rem;
+  }
+
+  .guideline-section strong {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  /* ── INFO BOXES ── */
+  .info-box {
+    padding: 1.4rem 1.8rem;
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    background: var(--surface);
+    margin: 1.4rem 0;
+    font-size: 0.88rem;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  .info-box strong { color: var(--accent); }
+
+  /* ── PROTOCOL STEPS ── */
+  .protocol-steps {
+    counter-reset: step;
+    list-style: none;
+    margin: 1rem 0 !important;
+  }
+
+  .protocol-steps li {
+    counter-increment: step;
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    padding: 0.8rem 0;
+    border-bottom: 1px solid rgba(26,48,80,0.5);
+  }
+  .protocol-steps li:last-child { border-bottom: none; }
+
+  .protocol-steps li::before {
+    content: counter(step, decimal-leading-zero);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--accent);
+    opacity: 0.7;
+    min-width: 2rem;
+    padding-top: 0.2rem;
+    flex-shrink: 0;
+  }
+
+  /* ── SAMPLE TYPE CARDS ── */
+  .sample-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin: 1.5rem 0;
+  }
+
+  .sample-card {
+    background: var(--bg);
+    padding: 1.8rem;
+    transition: background 0.25s;
+  }
+  .sample-card:hover { background: var(--surface); }
+
+  .sample-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    opacity: 0.7;
+    margin-bottom: 0.4rem;
+  }
+
+  .sample-name {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--white);
+    margin-bottom: 0.4rem;
+  }
+
+  .sample-detail {
+    font-size: 0.8rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  /* ── BACK TO TOP ── */
+  #upButton {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    z-index: 200;
+    width: 2.8rem;
+    height: 2.8rem;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--accent);
+    font-size: 1rem;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  #upButton:hover { border-color: var(--accent); background: var(--bg2); }
+  #upButton.visible { display: flex; }
+
+  /* ── FOOTER ── */
+  footer {
+    position: relative;
+    z-index: 1;
+    border-top: 1px solid var(--border);
+    padding: 2.5rem 4rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.8s, transform 0.8s;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    .guidelines-layout { flex-direction: column; padding: 3rem 1.5rem; }
+    .toc { width: 100%; position: static; }
+    .toc ul { display: flex; flex-wrap: wrap; gap: 0.2rem; }
+    .toc a { border-left: none; border-bottom: 1px solid var(--border); padding: 0.3rem 0.6rem; font-size: 0.75rem; }
+  }
+
+  @media (max-width: 768px) {
+    nav { padding: 1rem 1.5rem; }
+    .nav-links { gap: 1.2rem; }
+    .page-header { padding: 8rem 1.5rem 4rem; }
+    footer { flex-direction: column; gap: 1rem; text-align: center; }
+  }
+</style>
 </head>
 <body>
-  <header>
-    <h1>Frezza Lab Metabolomics Guidelines (Version 03.23)</h1>
-    <p>CECAD Research Center, University Hospital Cologne</p>
-  </header>
 
-  <nav class="main-nav">
+<canvas id="mol"></canvas>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-brand" href="index.html">Metabolomics · UCöln</a>
+  <ul class="nav-links">
+    <li><a href="index.html#about">About</a></li>
+    <li><a href="index.html#instruments">Instruments</a></li>
+    <li><a href="index.html#services">Services</a></li>
+    <li><a href="index.html#workflow">Workflow</a></li>
+    <li><a href="index.html#contact">Contact</a></li>
+    <li><a href="collaborations.html">Collaborations</a></li>
+    <li><a href="guidelines.html" class="active">Guidelines</a></li>
+  </ul>
+</nav>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <p class="eyebrow">Frezza Lab · Version 03.23</p>
+  <h1>Metabolomics<br><em>guidelines</em></h1>
+  <p class="sub">
+    Everything you need to know before submitting samples — experimental design, sample preparation, data acquisition, and analysis.
+  </p>
+  <div class="version-badge">Version <span>03.23</span> · CECAD Research Center · University Hospital Cologne</div>
+</div>
+
+<!-- GUIDELINES LAYOUT -->
+<div class="guidelines-layout">
+
+  <!-- STICKY TOC -->
+  <aside class="toc">
+    <p class="toc-label">Contents</p>
     <ul>
-      <li><a href="index.html">Home</a></li>
-      <li><a href="collaborations.html">Collaborations</a></li>
-      <li><a href="guidelines.html">Guidelines</a></li>
+      <li><a href="#overview">1. Overview</a></li>
+      <li><a href="#expdesign">2. Experimental Design</a></li>
+      <li><a href="#samplesubmission">3. Sample Preparation</a></li>
+      <li><a href="#dataacquisition">4. Data Acquisition</a></li>
+      <li><a href="#dataprocessing">5. Data Processing</a></li>
+      <li><a href="#biointerpretation">6. Interpretation & Publication</a></li>
+      <li><a href="#expconsiderations">7. Design Considerations</a></li>
+      <li><a href="#isotopetracing">8. Stable Isotope Tracing</a></li>
+      <li><a href="#replication">9. Sample Replication</a></li>
+      <li><a href="#sampleprep">10. Prep Considerations</a></li>
+      <li><a href="#quantitation">11. Quantitation</a></li>
+      <li><a href="#lcms">12. LC-MS Limitations</a></li>
+      <li><a href="#dataanalysis">13. Data Analysis</a></li>
+      <li><a href="#protocols">14. Protocols & Materials</a></li>
     </ul>
-  </nav>
+  </aside>
 
-  <div class="guidelines-container">
-    <!-- Sticky Table of Contents -->
-    <aside class="toc">
-      <h2>Table of Contents</h2>
+  <!-- MAIN CONTENT -->
+  <main class="guidelines-content">
+
+    <!-- 1 -->
+    <div class="guideline-section reveal" id="overview">
+      <p class="section-tag">01</p>
+      <h2>Overview</h2>
+      <p>
+        Metabolomics is the profiling of small molecules (metabolites) in complex biological matrices.
+        The Frezza Lab is equipped with Thermo Scientific Orbitrap Exploris 120 and 240 mass spectrometers,
+        coupled to a Vanquish Horizon UHPLC system. We focus on primary, water-soluble metabolites essential for
+        growth, development, and reproduction, using a semi-targeted approach with an in-house metabolite library.
+      </p>
+      <div class="info-box">
+        <strong>Note:</strong> Our HILIC-based platform is optimised for polar metabolites — nucleotides, amino acids, organic acids, and sugar phosphates. Reversed-phase methods are not in scope.
+      </div>
+    </div>
+
+    <!-- 2 -->
+    <div class="guideline-section reveal" id="expdesign">
+      <p class="section-tag">02</p>
+      <h2>Experimental Design</h2>
+      <p>
+        A well-designed experiment is crucial for success. After an initial collaboration inquiry,
+        a meeting is scheduled with Prof. Christian Frezza and the team to discuss project background, aims,
+        and experimental strategies. Please provide a brief project summary (in PowerPoint or Word format)
+        along with any preliminary data.
+      </p>
+    </div>
+
+    <!-- 3 -->
+    <div class="guideline-section reveal" id="samplesubmission">
+      <p class="section-tag">03</p>
+      <h2>Sample Preparation &amp; Submission</h2>
+      <p>
+        Prior to analysis, a sample submission form must be completed. Detailed protocols are provided
+        for various sample types:
+      </p>
+
+      <div class="sample-grid">
+        <div class="sample-card">
+          <p class="sample-label">Type A</p>
+          <p class="sample-name">Cultured Cells</p>
+          <p class="sample-detail">500 µl extraction buffer per 10⁶ cells. Wash with PBS before extraction.</p>
+        </div>
+        <div class="sample-card">
+          <p class="sample-label">Type B</p>
+          <p class="sample-name">Cell Culture Media</p>
+          <p class="sample-detail">Centrifuge to remove cells. Mix with extraction solution. Prepare pooled QC.</p>
+        </div>
+        <div class="sample-card">
+          <p class="sample-label">Type C</p>
+          <p class="sample-name">Tissues</p>
+          <p class="sample-detail">Snap-freeze, homogenize, 25 µl extraction buffer per mg tissue.</p>
+        </div>
+        <div class="sample-card">
+          <p class="sample-label">Type D</p>
+          <p class="sample-name">Biofluids</p>
+          <p class="sample-detail">Heparin tubes for plasma. Prompt processing. Additional filtration steps.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4 -->
+    <div class="guideline-section reveal" id="dataacquisition">
+      <p class="section-tag">04</p>
+      <h2>Data Acquisition</h2>
+      <p>
+        Data acquisition is performed using HILIC coupled with high-resolution MS.
+        Pooled QC samples are run at regular intervals (every 6–8 injections) to monitor instrument performance.
+        Both full-scan MS and MS2 fragmentation methods are used, depending on experimental needs.
+      </p>
+    </div>
+
+    <!-- 5 -->
+    <div class="guideline-section reveal" id="dataprocessing">
+      <p class="section-tag">05</p>
+      <h2>Data Processing</h2>
+      <p>
+        Data processing includes normalization of raw signal intensities and natural abundance correction
+        (for tracer-labelled studies). Data visualization is achieved through PCA plots, heat maps, bar graphs,
+        and volcano plots.
+      </p>
+    </div>
+
+    <!-- 6 -->
+    <div class="guideline-section reveal" id="biointerpretation">
+      <p class="section-tag">06</p>
+      <h2>Biological Interpretation &amp; Publication</h2>
+      <p>
+        The biological interpretation of metabolomic data is an area we are passionate about and highly value.
+        We will discuss the results extensively with collaborators, together with other lines of complementary
+        data, until a conclusion can be reached for the next step of the project.
+      </p>
+      <p>
+        If a follow-up study is required, the process is repeated until the results are ready for publication.
+        Where required, our in-house bioinformatician can provide further assistance on the integrative analysis
+        of multi-omics datasets, and with final data representation in figures.
+      </p>
+      <div class="info-box">
+        <strong>Data Deposition:</strong> For accepted manuscripts, we can deposit raw metabolomic data files on platforms such as MetaboLights and Metabolomics Workbench as requested by journals.
+      </div>
+    </div>
+
+    <!-- 7 -->
+    <div class="guideline-section reveal" id="expconsiderations">
+      <p class="section-tag">07</p>
+      <h2>Experimental Design Considerations</h2>
+      <p>
+        Considerations include selecting appropriate biological, technical, and analytical replicates.
+        For cell culture studies, at least five technical replicates per condition are recommended, while
+        animal studies typically require at least four biological replicates.
+      </p>
+    </div>
+
+    <!-- 8 -->
+    <div class="guideline-section reveal" id="isotopetracing">
+      <p class="section-tag">08</p>
+      <h2>Stable Isotope Tracing</h2>
+      <p>
+        Stable isotope tracers (e.g., ¹³C, ¹⁵N, ²H) are used to monitor metabolic fluxes.
+        To ensure accuracy, experiments must minimize metabolic perturbation and perform corrections
+        for natural isotope abundance.
+      </p>
+    </div>
+
+    <!-- 9 -->
+    <div class="guideline-section reveal" id="replication">
+      <p class="section-tag">09</p>
+      <h2>Sample Replication</h2>
+      <p>
+        Replication is essential for robust data. Biological replicates are sourced independently,
+        while technical replicates (repeating the entire procedure) help assess variance in sample processing.
+      </p>
+    </div>
+
+    <!-- 10 -->
+    <div class="guideline-section reveal" id="sampleprep">
+      <p class="section-tag">10</p>
+      <h2>Sample Preparation Considerations</h2>
+      <p>
+        Special considerations include consistent handling of cultured cells, including rapid quenching and
+        uniform extraction. For media, tissues, and biofluids, careful processing and pooling of samples is
+        critical to ensure data quality.
+      </p>
+    </div>
+
+    <!-- 11 -->
+    <div class="guideline-section reveal" id="quantitation">
+      <p class="section-tag">11</p>
+      <h2>Quantitation</h2>
+      <p>
+        Quantitative data are provided as relative signal intensities. For absolute quantitation,
+        an internal standard dilution approach is applied. Normalization varies for tissues, biofluids,
+        and cell samples.
+      </p>
+    </div>
+
+    <!-- 12 -->
+    <div class="guideline-section reveal" id="lcms">
+      <p class="section-tag">12</p>
+      <h2>LC-MS Limitations</h2>
+      <p>
+        Although LC-MS detects hundreds to thousands of metabolites with high sensitivity,
+        it is not highly precise due to variations in ionization efficiency and potential isobaric interference.
+        For key findings, further validation may be necessary.
+      </p>
+    </div>
+
+    <!-- 13 -->
+    <div class="guideline-section reveal" id="dataanalysis">
+      <p class="section-tag">13</p>
+      <h2>Data Analysis Overview</h2>
+      <p>Our analysis pipeline includes:</p>
       <ul>
-        <li><a href="#overview">1. Overview</a></li>
-        <li><a href="#expdesign">2. Experimental Design</a></li>
-        <li><a href="#samplesubmission">3. Sample Preparation &amp; Submission</a></li>
-        <li><a href="#dataacquisition">4. Data Acquisition</a></li>
-        <li><a href="#dataprocessing">5. Data Processing</a></li>
-        <li><a href="#biointerpretation">6. Biological Interpretation &amp; Publication</a></li>
-        <li><a href="#expconsiderations">7. Experimental Design Considerations</a></li>
-        <li><a href="#isotopetracing">8. Stable Isotope Tracing</a></li>
-        <li><a href="#replication">9. Sample Replication</a></li>
-        <li><a href="#sampleprep">10. Sample Preparation Considerations</a></li>
-        <li><a href="#quantitation">11. Quantitation</a></li>
-        <li><a href="#lcms">12. LC-MS Limitations</a></li>
-        <li><a href="#dataanalysis">13. Data Analysis Overview</a></li>
-        <li><a href="#protocols">14. Protocols &amp; Materials</a></li>
+        <li>Primary data reporting with peak area and metabolite metadata.</li>
+        <li>PCA plots for assessing sample similarities and detecting outliers.</li>
+        <li>Heat maps for visualizing metabolite patterns.</li>
+        <li>Bar graphs and volcano plots to highlight significant changes.</li>
+        <li>Stacked bar graphs for tracer-labelled data.</li>
       </ul>
-    </aside>
+    </div>
 
-    <!-- Main Guidelines Content -->
-    <main class="content">
-      <!-- 1. Overview -->
-      <div id="overview">
-        <h2>1. Overview</h2>
-        <p>
-          Metabolomics is the profiling of small molecules (metabolites) in complex biological matrices.
-          The Frezza Lab is equipped with Thermo Scientific Orbitrap Exploris 120 and 240 mass spectrometers,
-          coupled to a Vanquish Horizon UHPLC system. We focus on primary, water‑soluble metabolites essential for
-          growth, development, and reproduction, using a semi‑targeted approach with an in‑house metabolite library.
-        </p>
-      </div>
+    <!-- 14 -->
+    <div class="guideline-section reveal" id="protocols">
+      <p class="section-tag">14</p>
+      <h2>Protocols &amp; Materials</h2>
+      <p>
+        <strong>Materials:</strong> LC-MS grade Methanol, Acetonitrile, ultrapure water, and standards (e.g., Valine-d8).
+        Additional supplies include Eppendorf tubes, cell scrapers, autosampler vials, cryo-labels, and dry ice.
+      </p>
 
-      <!-- 2. Experimental Design -->
-      <div id="expdesign">
-        <h2>2. Experimental Design</h2>
-        <p>
-          A well‑designed experiment is crucial for success. After an initial collaboration inquiry,
-          a meeting is scheduled with Prof. Christian Frezza and the team to discuss project background, aims,
-          and experimental strategies. Please provide a brief project summary (in PowerPoint or Word format)
-          along with any preliminary data.
-        </p>
-      </div>
+      <h3>A. Cultured Cells</h3>
+      <ol class="protocol-steps">
+        <li>Count cells and calculate extraction buffer (500 µl per 10⁶ cells).</li>
+        <li>Remove medium, wash with PBS, and aspirate thoroughly.</li>
+        <li>Place plate on dry ice; add extraction buffer and incubate on a dry ice–methanol bath for 20 minutes.</li>
+        <li>Scrape cells, transfer to pre-chilled tubes, shake in a Thermomixer at 4 °C for 15 minutes, and centrifuge.</li>
+        <li>Collect the top 80 % of the supernatant and prepare a pooled QC sample from equal aliquots.</li>
+      </ol>
 
-      <!-- 3. Sample Preparation & Submission -->
-      <div id="samplesubmission">
-        <h2>3. Sample Preparation &amp; Submission</h2>
-        <p>
-          Prior to analysis, a sample submission form must be completed. Detailed protocols are provided
-          for various sample types:
-        </p>
-        <ul>
-          <li><strong>Cultured Cells:</strong> Wash with PBS, extract with 500 µl extraction buffer per 10<sup>6</sup> cells, and label vials clearly.</li>
-          <li><strong>Cell Culture Media (CCM):</strong> Centrifuge to remove cells, mix with extraction solution, and prepare a pooled QC sample.</li>
-          <li><strong>Tissues:</strong> Excise rapidly, snap‑freeze, homogenize using Precellys tubes, and extract with 25 µl extraction solution per mg tissue.</li>
-          <li><strong>Biofluids:</strong> Process blood samples promptly (using heparin tubes for plasma) with additional filtration steps as needed.</li>
-        </ul>
-      </div>
+      <h3>B. Cell Culture Media (CCM)</h3>
+      <ol class="protocol-steps">
+        <li>Centrifuge 80 µl of CCM to remove cells.</li>
+        <li>Add the supernatant to 350 µl of extraction solution on dry ice.</li>
+        <li>Mix, shake at 4 °C for 15 minutes, centrifuge, and collect the top 80 % of the supernatant.</li>
+        <li>Pool equal volumes for a QC sample.</li>
+      </ol>
 
-      <!-- 4. Data Acquisition -->
-      <div id="dataacquisition">
-        <h2>4. Data Acquisition</h2>
-        <p>
-          Data acquisition is performed using HILIC coupled with high‑resolution MS.
-          Pooled QC samples are run at regular intervals (every 6–8 injections) to monitor instrument performance.
-          Both full‑scan MS and MS2 fragmentation methods are used, depending on experimental needs.
-        </p>
-      </div>
+      <h3>C. Tissues</h3>
+      <ol class="protocol-steps">
+        <li>Weigh and label tissue (10–20 mg recommended).</li>
+        <li>Add extraction solution at 25 µl per mg tissue.</li>
+        <li>Homogenize using a Precellys tissue homogenizer.</li>
+        <li>Shake, centrifuge, and carefully collect the supernatant.</li>
+        <li>Prepare a pooled sample.</li>
+      </ol>
 
-      <!-- 5. Data Processing -->
-      <div id="dataprocessing">
-        <h2>5. Data Processing</h2>
-        <p>
-          Data processing includes normalization of raw signal intensities and natural abundance correction
-          (for tracer‑labelled studies). Data visualization is achieved through PCA plots, heat maps, bar graphs,
-          and volcano plots.
-        </p>
-      </div>
+      <h3>D. Plasma / Serum</h3>
+      <ol class="protocol-steps">
+        <li>Collect blood using a heparin tube (or allow serum to clot).</li>
+        <li>Centrifuge promptly to separate plasma/serum, avoiding the buffy coat.</li>
+        <li>Mix 40 µl of plasma with 360 µl of extraction solution on dry ice.</li>
+        <li>Vortex, shake at 4 °C, centrifuge, and filter using an Amicon Ultra-0.5 centrifugal filter unit.</li>
+      </ol>
 
-      <!-- 6. Biological Interpretation & Publication -->
-      <div id="biointerpretation">
-        <h2>6. Biological Interpretation &amp; Publication</h2>
-        <p>
-          The biological interpretation of metabolomic data is an area we are passionate about and highly value. 
-   We will discuss the results extensively with collaborators, together with other lines of complementary 
-   data, until a conclusion can be reached for the next step of the project. If a follow-up study is required, 
-   the process is repeated until the results are ready for publication. Where required, our in-house 
-   bioinformatician can provide further assistance on the integrative analysis of multi-omics datasets, and 
-   with final data representation in figures. For accepted manuscripts, we can deposit raw metabolomic 
-   data files on platforms such as MetaboLights and Metabolomics Workbench as requested by some 
-   journals.
-        </p>
-      </div>
+      <h3>E. Genomic NA Digestion</h3>
+      <ol class="protocol-steps">
+        <li>Isolate genomic DNA using an appropriate kit (e.g., QIAGEN DNeasy Blood &amp; Tissue Kit).</li>
+        <li>Digest using Nucleoside Digestion Mix (NEB) as per manufacturer instructions.</li>
+        <li>Add water and methanol, vortex, centrifuge, and collect the supernatant.</li>
+      </ol>
+    </div>
 
-      <!-- 7. Experimental Design Considerations -->
-      <div id="expconsiderations">
-        <h2>7. Experimental Design Considerations</h2>
-        <p>
-          Considerations include selecting appropriate biological, technical, and analytical replicates.
-          For cell culture studies, at least five technical replicates per condition are recommended, while
-          animal studies typically require at least four biological replicates.
-        </p>
-      </div>
+  </main>
+</div>
 
-      <!-- 8. Stable Isotope Tracing -->
-      <div id="isotopetracing">
-        <h2>8. Stable Isotope Tracing</h2>
-        <p>
-          Stable isotope tracers (e.g., 13C, 15N, 2H) are used to monitor metabolic fluxes.
-          To ensure accuracy, experiments must minimize metabolic perturbation and perform corrections
-          for natural isotope abundance.
-        </p>
-      </div>
+<!-- BACK TO TOP -->
+<button id="upButton" title="Back to top" aria-label="Back to top">↑</button>
 
-      <!-- 9. Sample Replication -->
-      <div id="replication">
-        <h2>9. Sample Replication</h2>
-        <p>
-          Replication is essential for robust data. Biological replicates are sourced independently,
-          while technical replicates (repeating the entire procedure) help assess variance in sample processing.
-        </p>
-      </div>
+<!-- FOOTER -->
+<footer>
+  <span>© 2025 University Metabolomics Group · University of Cologne</span>
+  <span>Polar HILIC · Orbitrap Exploris 120 & 240</span>
+</footer>
 
-      <!-- 10. Sample Preparation Considerations -->
-      <div id="sampleprep">
-        <h2>10. Sample Preparation Considerations</h2>
-        <p>
-          Special considerations include consistent handling of cultured cells, including rapid quenching and
-          uniform extraction. For media, tissues, and biofluids, careful processing and pooling of samples is
-          critical to ensure data quality.
-        </p>
-      </div>
+<script>
+/* ── Molecular network background ── */
+const canvas = document.getElementById('mol');
+const ctx = canvas.getContext('2d');
+let W, H, nodes;
 
-      <!-- 11. Quantitation -->
-      <div id="quantitation">
-        <h2>11. Quantitation</h2>
-        <p>
-          Quantitative data are provided as relative signal intensities. For absolute quantitation,
-          an internal standard dilution approach is applied. Normalization varies for tissues, biofluids,
-          and cell samples.
-        </p>
-      </div>
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
 
-      <!-- 12. LC-MS Limitations -->
-      <div id="lcms">
-        <h2>12. LC-MS Limitations</h2>
-        <p>
-          Although LC-MS detects hundreds to thousands of metabolites with high sensitivity,
-          it is not highly precise due to variations in ionization efficiency and potential isobaric interference.
-          For key findings, further validation may be necessary.
-        </p>
-      </div>
+function init() {
+  resize();
+  nodes = Array.from({ length: 60 }, () => ({
+    x: Math.random() * W,
+    y: Math.random() * H,
+    vx: (Math.random() - 0.5) * 0.3,
+    vy: (Math.random() - 0.5) * 0.3,
+    r: Math.random() * 2.5 + 1,
+  }));
+}
 
-      <!-- 13. Data Analysis Overview -->
-      <div id="dataanalysis">
-        <h2>13. Data Analysis Overview</h2>
-        <p>
-          Our analysis includes:
-        </p>
-        <ul>
-          <li>Primary data reporting with peak area and metabolite metadata.</li>
-          <li>PCA plots for assessing sample similarities and detecting outliers.</li>
-          <li>Heat maps for visualizing metabolite patterns.</li>
-          <li>Bar graphs and volcano plots to highlight significant changes.</li>
-          <li>Stacked bar graphs for tracer‑labelled data.</li>
-        </ul>
-      </div>
-
-      <!-- 14. Protocols & Materials -->
-      <div id="protocols">
-        <h2>14. Protocols &amp; Materials</h2>
-        <p>
-          <strong>Materials:</strong> LC‑MS grade Methanol, Acetonitrile, ultrapure water, and standards (e.g., Valine‑d8).
-          Additional supplies include Eppendorf tubes, cell scrapers, autosampler vials, cryo‑labels, and dry ice.
-        </p>
-        <h3>Extraction Protocols</h3>
-        <p><strong>A. Cultured Cells:</strong></p>
-        <p>
-          1. Count cells and calculate extraction buffer (500 µl per 10<sup>6</sup> cells).<br>
-          2. Remove medium, wash with PBS, and aspirate thoroughly.<br>
-          3. Place plate on dry ice; add extraction buffer and incubate on a dry ice‑methanol bath for 20 minutes.<br>
-          4. Scrape cells, transfer to pre‑chilled tubes, shake in a Thermomixer at 4°C for 15 minutes, and centrifuge. Collect the top 80% of the supernatant.<br>
-          5. Prepare a pooled sample from equal aliquots.
-        </p>
-        <p><strong>B. Cell Culture Media (CCM):</strong></p>
-        <p>
-          1. Centrifuge 80 µl of CCM to remove cells.<br>
-          2. Add the supernatant to 350 µl of extraction solution on dry ice.<br>
-          3. Mix, shake at 4°C for 15 minutes, centrifuge, and collect the top 80% of the supernatant.<br>
-          4. Pool equal volumes for a QC sample.
-        </p>
-        <p><strong>C. Tissues:</strong></p>
-        <p>
-          1. Weigh and label tissue (10–20 mg recommended).<br>
-          2. Add extraction solution at 25 µl per mg tissue.<br>
-          3. Homogenize using a Precellys tissue homogenizer.<br>
-          4. Shake, centrifuge, and carefully collect the supernatant.<br>
-          5. Prepare a pooled sample.
-        </p>
-        <p><strong>D. Plasma/Serum:</strong></p>
-        <p>
-          1. Collect blood using a heparin tube (or allow serum to clot).<br>
-          2. Centrifuge promptly to separate plasma/serum, avoiding the buffy coat.<br>
-          3. Mix 40 µl of plasma with 360 µl of extraction solution on dry ice.<br>
-          4. Vortex, shake at 4°C, centrifuge, and filter using an Amicon Ultra-0.5 centrifugal filter unit.
-        </p>
-        <p><strong>E. Genomic NA Digestion Protocol:</strong></p>
-        <p>
-          1. Isolate genomic DNA using an appropriate kit (e.g., QIAGEN Neasy Blood &amp; Tissue Kit).<br>
-          2. Digest using Nucleoside Digestion Mix (NEB) as per manufacturer instructions.<br>
-          3. Add water and methanol, vortex, centrifuge, and collect the supernatant.
-        </p>
-      </div>
-    </main>
-  </div><!-- /.guidelines-container -->
-
-  <!-- "Up" Button -->
-  <button id="upButton" title="Go to top">Up</button>
-
-  <footer>
-    <p>&copy; 2025 University Metabolomics Group. All Rights Reserved.</p>
-  </footer>
-
-  <script>
-    // Show the "Up" button when scrolled down 200px from the top
-    const upButton = document.getElementById("upButton");
-    window.addEventListener("scroll", function() {
-      if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
-        upButton.style.display = "block";
-      } else {
-        upButton.style.display = "none";
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+  for (let i = 0; i < nodes.length; i++) {
+    for (let j = i + 1; j < nodes.length; j++) {
+      const dx = nodes[i].x - nodes[j].x;
+      const dy = nodes[i].y - nodes[j].y;
+      const d = Math.sqrt(dx * dx + dy * dy);
+      if (d < 130) {
+        ctx.beginPath();
+        ctx.moveTo(nodes[i].x, nodes[i].y);
+        ctx.lineTo(nodes[j].x, nodes[j].y);
+        ctx.strokeStyle = `rgba(0,201,167,${(1 - d / 130) * 0.5})`;
+        ctx.lineWidth = 0.5;
+        ctx.stroke();
       }
-    });
-    
-    // Scroll to top when the button is clicked
-    upButton.addEventListener("click", function() {
-      window.scrollTo({
-        top: 0,
-        behavior: "smooth"
-      });
-    });
-  </script>
+    }
+  }
+  nodes.forEach(n => {
+    ctx.beginPath();
+    ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(77,171,247,0.6)';
+    ctx.fill();
+    n.x += n.vx;
+    n.y += n.vy;
+    if (n.x < 0 || n.x > W) n.vx *= -1;
+    if (n.y < 0 || n.y > H) n.vy *= -1;
+  });
+  requestAnimationFrame(draw);
+}
+
+window.addEventListener('resize', () => { resize(); });
+init();
+draw();
+
+/* ── Scroll reveal ── */
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) e.target.classList.add('visible');
+  });
+}, { threshold: 0.08 });
+
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+/* ── Back to top ── */
+const upBtn = document.getElementById('upButton');
+window.addEventListener('scroll', () => {
+  upBtn.classList.toggle('visible', window.scrollY > 300);
+});
+upBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+/* ── Active TOC highlight ── */
+const sections = document.querySelectorAll('.guideline-section');
+const tocLinks = document.querySelectorAll('.toc a');
+
+const tocObserver = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      tocLinks.forEach(a => a.classList.remove('active'));
+      const active = document.querySelector(`.toc a[href="#${entry.target.id}"]`);
+      if (active) active.classList.add('active');
+    }
+  });
+}, { rootMargin: '-20% 0px -70% 0px' });
+
+sections.forEach(s => tocObserver.observe(s));
+</script>
 </body>
 </html>

@@ -1,44 +1,725 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>University Metabolomics Group</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: Arial, sans-serif; background: #f4f4f4; color: #333; line-height: 1.6; }
-    header { background: #333; color: #fff; padding: 20px 0; text-align: center; }
-    nav { background: #444; }
-    nav ul { display: flex; justify-content: center; list-style: none; }
-    nav ul li { margin: 0 15px; }
-    nav ul li a { color: #fff; text-decoration: none; padding: 10px; display: block; }
-    nav ul li a:hover { background: #555; }
-    section { max-width: 960px; margin: 20px auto; background: #fff; padding: 20px; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-    footer { background: #333; color: #fff; text-align: center; padding: 10px 0; margin-top: 20px; }
-    h1, h2 { margin-bottom: 15px; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Metabolomics Core Facility · University of Cologne</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=DM+Mono:wght@300;400&family=Outfit:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:       #050d1a;
+    --bg2:      #091527;
+    --surface:  #0d1e33;
+    --border:   #1a3050;
+    --accent:   #00c9a7;
+    --accent2:  #4dabf7;
+    --gold:     #c9a84c;
+    --text:     #d4e3f5;
+    --muted:    #607d9b;
+    --white:    #eef4ff;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Outfit', sans-serif;
+    font-weight: 300;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* ── CANVAS BACKGROUND ── */
+  canvas#mol {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    opacity: 0.18;
+    pointer-events: none;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.2rem 4rem;
+    background: rgba(5,13,26,0.85);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-brand {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.18em;
+    color: var(--accent);
+    text-transform: uppercase;
+    text-decoration: none;
+  }
+
+  .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+  .nav-links a {
+    text-decoration: none;
+    font-size: 0.82rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--accent); }
+
+  /* ── HERO ── */
+  .hero {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 10rem 4rem 6rem;
+  }
+
+  .hero-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.22em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 1.6rem;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.2s forwards;
+  }
+
+  .hero h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-size: clamp(3rem, 7vw, 6.5rem);
+    line-height: 1.05;
+    color: var(--white);
+    max-width: 13ch;
+    opacity: 0;
+    animation: fadeUp 0.9s 0.4s forwards;
+  }
+
+  .hero h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .hero-sub {
+    margin-top: 2rem;
+    max-width: 48ch;
+    font-size: 1rem;
+    color: var(--muted);
+    opacity: 0;
+    animation: fadeUp 0.9s 0.6s forwards;
+  }
+
+  .hero-cta {
+    margin-top: 3rem;
+    display: flex;
+    gap: 1.2rem;
+    flex-wrap: wrap;
+    opacity: 0;
+    animation: fadeUp 0.9s 0.8s forwards;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 2rem;
+    border-radius: 2px;
+    font-size: 0.82rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-decoration: none;
+    cursor: pointer;
+    border: none;
+    transition: all 0.25s;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #020d18;
+    font-weight: 500;
+  }
+  .btn-primary:hover { background: #00e6be; transform: translateY(-1px); }
+
+  .btn-ghost {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ── INSTRUMENTS STRIP ── */
+  .instruments-strip {
+    position: relative; z-index: 1;
+    display: flex;
+    align-items: stretch;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  .instrument-card {
+    flex: 1;
+    padding: 2.5rem 3rem;
+    border-right: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+    transition: background 0.3s;
+  }
+  .instrument-card:last-child { border-right: none; }
+  .instrument-card:hover { background: var(--surface); }
+
+  .instrument-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .instrument-card:hover::before { opacity: 1; }
+
+  .inst-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.5rem;
+  }
+  .inst-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.6rem;
+    font-weight: 400;
+    color: var(--white);
+  }
+  .inst-detail {
+    margin-top: 0.4rem;
+    font-size: 0.82rem;
+    color: var(--muted);
+  }
+
+  /* ── SECTIONS ── */
+  section {
+    position: relative;
+    z-index: 1;
+    padding: 6rem 4rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .section-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+  .section-tag::after {
+    content: '';
+    flex: 1;
+    max-width: 60px;
+    height: 1px;
+    background: var(--accent);
+    opacity: 0.4;
+  }
+
+  h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    color: var(--white);
+    line-height: 1.2;
+    margin-bottom: 2rem;
+  }
+
+  /* ── CAPABILITIES GRID ── */
+  .cap-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin-top: 3rem;
+  }
+
+  .cap-item {
+    background: var(--bg);
+    padding: 2rem;
+    transition: background 0.25s;
+    cursor: default;
+  }
+  .cap-item:hover { background: var(--surface); }
+
+  .cap-icon {
+    font-size: 1.6rem;
+    margin-bottom: 1rem;
+    display: block;
+  }
+
+  .cap-title {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--white);
+    margin-bottom: 0.5rem;
+  }
+
+  .cap-desc {
+    font-size: 0.84rem;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  /* ── STATS ── */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2rem;
+    margin-top: 3rem;
+    padding: 3rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+  }
+
+  .stat { text-align: center; }
+  .stat-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 3.5rem;
+    font-weight: 300;
+    color: var(--accent);
+    line-height: 1;
+    display: block;
+  }
+  .stat-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 0.4rem;
+    display: block;
+  }
+
+  /* ── WORKFLOW ── */
+  .workflow {
+    display: flex;
+    gap: 0;
+    margin-top: 3rem;
+    position: relative;
+  }
+
+  .workflow::before {
+    content: '';
+    position: absolute;
+    top: 2.2rem;
+    left: 2.2rem;
+    right: 2.2rem;
+    height: 1px;
+    background: linear-gradient(90deg, var(--accent) 0%, var(--accent2) 100%);
+    opacity: 0.3;
+  }
+
+  .wf-step {
+    flex: 1;
+    padding: 2rem 1.5rem;
+    position: relative;
+  }
+
+  .wf-num {
+    width: 2.8rem;
+    height: 2.8rem;
+    border-radius: 50%;
+    border: 1px solid var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--accent);
+    margin-bottom: 1.2rem;
+    background: var(--bg);
+    position: relative;
+    z-index: 1;
+  }
+
+  .wf-title {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--white);
+    margin-bottom: 0.4rem;
+  }
+
+  .wf-desc {
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+
+  /* ── CONTACT CARD ── */
+  .contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-top: 3rem;
+  }
+
+  .contact-block {
+    padding: 2.5rem;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .contact-block::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+  }
+
+  .contact-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.8rem;
+  }
+
+  .contact-value {
+    font-size: 1rem;
+    color: var(--white);
+  }
+
+  .contact-value a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+  .contact-value a:hover { text-decoration: underline; }
+
+  /* ── FOOTER ── */
+  footer {
+    position: relative;
+    z-index: 1;
+    border-top: 1px solid var(--border);
+    padding: 2.5rem 4rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.8s, transform 0.8s;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    nav { padding: 1rem 1.5rem; }
+    .hero { padding: 8rem 1.5rem 4rem; }
+    section { padding: 4rem 1.5rem; }
+    .instruments-strip { flex-direction: column; }
+    .instrument-card { border-right: none; border-bottom: 1px solid var(--border); }
+    .stats-row { grid-template-columns: 1fr 1fr; }
+    .workflow { flex-direction: column; }
+    .workflow::before { display: none; }
+    .contact-grid { grid-template-columns: 1fr; }
+    footer { flex-direction: column; gap: 1rem; text-align: center; }
+  }
+</style>
 </head>
 <body>
-  <header>
-    <h1>University Metabolomics Group</h1>
-    <p>Polar HILIC Analysis | Orbitrap Exploris 120 &amp; 240</p>
-  </header>
-  
-  <nav>
-    <ul>
-      <li><a href="index.html">Home</a></li>
-      <li><a href="collaborations.html">Collaborations</a></li>
-      <li><a href="guidelines.html">Guidelines</a></li>
-    </ul>
-  </nav>
-  
-  <section id="about">
-    <h2>About Us</h2>
-    <p>Welcome to the University Metabolomics Group. We specialize in advanced metabolomics research using polar HILIC techniques coupled with state‑of‑the‑art Orbitrap Exploris instruments. Explore our site to learn about potential collaborations and review our detailed sample submission and experimental guidelines.</p>
-  </section>
-  
-  <footer>
-    <p>&copy; 2025 University Metabolomics Group. All Rights Reserved.</p>
-  </footer>
+
+<canvas id="mol"></canvas>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-brand" href="index.html">Metabolomics · UCöln</a>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#instruments">Instruments</a></li>
+    <li><a href="#services">Services</a></li>
+    <li><a href="#workflow">Workflow</a></li>
+    <li><a href="#contact">Contact</a></li>
+    <li><a href="collaborations.html">Collaborations</a></li>
+    <li><a href="guidelines.html">Guidelines</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <p class="hero-eyebrow">Metabolomics Core Facility · University of Cologne</p>
+  <h1>Precision<br><em>metabolomics</em><br>at scale</h1>
+  <p class="hero-sub">
+    Polar HILIC analysis coupled to high-resolution Orbitrap mass spectrometry.
+    Quantitative, reproducible, and publication-ready data for your research.
+  </p>
+  <div class="hero-cta">
+    <a href="#workflow" class="btn btn-primary">Submit Samples →</a>
+    <a href="#services" class="btn btn-ghost">Our Services</a>
+  </div>
+</div>
+
+<!-- INSTRUMENTS STRIP -->
+<div class="instruments-strip" id="instruments">
+  <div class="instrument-card reveal">
+    <p class="inst-label">Primary Platform</p>
+    <p class="inst-name">Orbitrap Exploris 240</p>
+    <p class="inst-detail">FAIMS Pro · 480 000 resolving power · DDA / DIA</p>
+  </div>
+  <div class="instrument-card reveal">
+    <p class="inst-label">Secondary Platform</p>
+    <p class="inst-name">Orbitrap Exploris 120</p>
+    <p class="inst-detail">120 000 resolving power · Targeted & untargeted</p>
+  </div>
+  <div class="instrument-card reveal">
+    <p class="inst-label">Separation</p>
+    <p class="inst-name">Polar HILIC</p>
+    <p class="inst-detail">Optimised for polar metabolites · ESI+/−</p>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section id="about">
+  <p class="section-tag reveal">About us</p>
+  <h2 class="reveal">Where analytical<br>chemistry meets discovery</h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:3rem;" class="reveal">
+    <p style="color:var(--muted);font-size:0.95rem;">
+      We are a dedicated metabolomics core facility embedded within the University of Cologne. Our team combines deep expertise in analytical chemistry, bioinformatics, and biological interpretation to deliver comprehensive metabolomics services for internal and external collaborators.
+    </p>
+    <p style="color:var(--muted);font-size:0.95rem;">
+      From sample preparation consultation to final statistical analysis, we support your project through every stage. Our polar HILIC methods excel at capturing the hydrophilic metabolome — nucleotides, amino acids, organic acids, and sugar phosphates — that reversed-phase methods miss.
+    </p>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row reveal">
+    <div class="stat">
+      <span class="stat-num">240k</span>
+      <span class="stat-label">Resolving power</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">&lt;5</span>
+      <span class="stat-label">ppm mass accuracy</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">600+</span>
+      <span class="stat-label">Annotated metabolites</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">2</span>
+      <span class="stat-label">Orbitrap platforms</span>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section id="services" style="padding-top:0;">
+  <p class="section-tag reveal">Services</p>
+  <h2 class="reveal">What we offer</h2>
+
+  <div class="cap-grid reveal">
+    <div class="cap-item">
+      <span class="cap-icon">🔬</span>
+      <p class="cap-title">Untargeted Metabolomics</p>
+      <p class="cap-desc">Discovery-mode HILIC-MS with full-scan and MS² acquisition. Spectral library matching + in-silico annotation via SIRIUS/CSI:FingerID.</p>
+    </div>
+    <div class="cap-item">
+      <span class="cap-icon">🎯</span>
+      <p class="cap-title">Targeted Quantification</p>
+      <p class="cap-desc">Validated MRM-like workflows using exact masses. Internal-standard normalised concentrations with QC reports.</p>
+    </div>
+    <div class="cap-item">
+      <span class="cap-icon">📊</span>
+      <p class="cap-title">Statistical Analysis</p>
+      <p class="cap-desc">PCA, PLS-DA, volcano plots, pathway enrichment (MetaboAnalyst / KEGG). Reproducible R/Python reports.</p>
+    </div>
+    <div class="cap-item">
+      <span class="cap-icon">🧫</span>
+      <p class="cap-title">Sample Prep Consulting</p>
+      <p class="cap-desc">Extraction protocol optimisation for cells, plasma, tissue, or biofluids. Pre-analytical QC assessment.</p>
+    </div>
+    <div class="cap-item">
+      <span class="cap-icon">📁</span>
+      <p class="cap-title">Data Management</p>
+      <p class="cap-desc">Raw .RAW files, mzML conversion, peak tables, and annotated compound lists delivered via secure transfer.</p>
+    </div>
+    <div class="cap-item">
+      <span class="cap-icon">🤝</span>
+      <p class="cap-title">Collaborations</p>
+      <p class="cap-desc">Grant co-authorship, long-term method development, and dedicated instrument time for active collaborations.</p>
+    </div>
+  </div>
+</section>
+
+<!-- WORKFLOW -->
+<section id="workflow" style="padding-top:0;">
+  <p class="section-tag reveal">Sample submission</p>
+  <h2 class="reveal">From sample to data<br>in four steps</h2>
+
+  <div class="workflow reveal">
+    <div class="wf-step">
+      <div class="wf-num">01</div>
+      <p class="wf-title">Inquiry & Consultation</p>
+      <p class="wf-desc">Contact us with your biological question. We'll advise on sample number, replicates, and extraction protocol.</p>
+    </div>
+    <div class="wf-step">
+      <div class="wf-num">02</div>
+      <p class="wf-title">Sample Submission</p>
+      <p class="wf-desc">Fill out the sample submission form. Ship or hand-deliver samples on dry ice according to our guidelines.</p>
+    </div>
+    <div class="wf-step">
+      <div class="wf-num">03</div>
+      <p class="wf-title">Acquisition & QC</p>
+      <p class="wf-desc">Samples run in randomised blocks with pooled QC injections. Real-time internal standard monitoring ensures run quality.</p>
+    </div>
+    <div class="wf-step">
+      <div class="wf-num">04</div>
+      <p class="wf-title">Data Delivery</p>
+      <p class="wf-desc">Peak-picked, normalised tables with annotations and a QC report. Optional: statistical analysis and pathway mapping.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact" style="padding-top:0;">
+  <p class="section-tag reveal">Contact</p>
+  <h2 class="reveal">Get in touch</h2>
+
+  <div class="contact-grid reveal">
+    <div class="contact-block">
+      <p class="contact-label">Email</p>
+      <p class="contact-value"><a href="mailto:abc@uni-koeln.de">abc@uni-koeln.de</a></p>
+    </div>
+    <div class="contact-block">
+      <p class="contact-label">Location</p>
+      <p class="contact-value">University of Cologne<br>CECAD Research Center</p>
+    </div>
+    <div class="contact-block">
+      <p class="contact-label">Collaborations</p>
+      <p class="contact-value">Internal (UzK), DFG projects, and external academic institutions welcome.</p>
+    </div>
+    <div class="contact-block">
+      <p class="contact-label">Guidelines</p>
+      <p class="contact-value">
+        <a href="guidelines.html">Sample submission guidelines →</a><br>
+        <a href="collaborations.html">Collaboration policy →</a>
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <span>© 2025 University Metabolomics Group · University of Cologne</span>
+  <span>Polar HILIC · Orbitrap Exploris 120 & 240</span>
+</footer>
+
+<script>
+/* ── Molecular network background ── */
+const canvas = document.getElementById('mol');
+const ctx = canvas.getContext('2d');
+let W, H, nodes;
+
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+
+function init() {
+  resize();
+  nodes = Array.from({ length: 60 }, () => ({
+    x: Math.random() * W,
+    y: Math.random() * H,
+    vx: (Math.random() - 0.5) * 0.3,
+    vy: (Math.random() - 0.5) * 0.3,
+    r: Math.random() * 2.5 + 1,
+  }));
+}
+
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+
+  // Edges
+  for (let i = 0; i < nodes.length; i++) {
+    for (let j = i + 1; j < nodes.length; j++) {
+      const dx = nodes[i].x - nodes[j].x;
+      const dy = nodes[i].y - nodes[j].y;
+      const d = Math.sqrt(dx * dx + dy * dy);
+      if (d < 130) {
+        ctx.beginPath();
+        ctx.moveTo(nodes[i].x, nodes[i].y);
+        ctx.lineTo(nodes[j].x, nodes[j].y);
+        ctx.strokeStyle = `rgba(0,201,167,${(1 - d / 130) * 0.5})`;
+        ctx.lineWidth = 0.5;
+        ctx.stroke();
+      }
+    }
+  }
+
+  // Nodes
+  nodes.forEach(n => {
+    ctx.beginPath();
+    ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(77,171,247,0.6)';
+    ctx.fill();
+
+    n.x += n.vx;
+    n.y += n.vy;
+    if (n.x < 0 || n.x > W) n.vx *= -1;
+    if (n.y < 0 || n.y > H) n.vy *= -1;
+  });
+
+  requestAnimationFrame(draw);
+}
+
+window.addEventListener('resize', () => { resize(); });
+init();
+draw();
+
+/* ── Scroll reveal ── */
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) e.target.classList.add('visible');
+  });
+}, { threshold: 0.12 });
+
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+</script>
 </body>
 </html>
