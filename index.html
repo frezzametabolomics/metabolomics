@@ -179,27 +179,22 @@
   .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
 
   /* ── INSTRUMENTS STRIP ── */
-  .instruments-strip {
-    position: relative; z-index: 1;
-    display: flex;
-    align-items: stretch;
-    border-top: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
-    overflow: hidden;
+  /* ── INSTRUMENTS SECTION ── */
+  .inst-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-top: 2.5rem;
   }
-
-  .instrument-card {
-    flex: 1;
-    padding: 2.5rem 3rem;
-    border-right: 1px solid var(--border);
+  .inst-full-card {
+    border: 1px solid var(--border);
+    background: var(--surface);
+    overflow: hidden;
+    transition: border-color 0.3s;
     position: relative;
-    overflow: hidden;
-    transition: background 0.3s;
   }
-  .instrument-card:last-child { border-right: none; }
-  .instrument-card:hover { background: var(--surface); }
-
-  .instrument-card::before {
+  .inst-full-card:hover { border-color: var(--accent); }
+  .inst-full-card::before {
     content: '';
     position: absolute;
     top: 0; left: 0; right: 0;
@@ -208,8 +203,47 @@
     opacity: 0;
     transition: opacity 0.3s;
   }
-  .instrument-card:hover::before { opacity: 1; }
+  .inst-full-card:hover::before { opacity: 1; }
 
+  .inst-photo {
+    width: 100%;
+    aspect-ratio: 4/3;
+    background: #0a0a0a;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .inst-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    filter: grayscale(20%);
+    transition: filter 0.4s;
+  }
+  .inst-full-card:hover .inst-photo img { filter: grayscale(0%); }
+  .inst-photo-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    color: #333;
+    text-align: center;
+    padding: 1.5rem;
+  }
+  .inst-photo-placeholder svg { opacity: 0.3; }
+  .inst-photo-placeholder span {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #333;
+  }
+
+  .inst-full-body { padding: 1.8rem; }
   .inst-label {
     font-family: 'DM Mono', monospace;
     font-size: 0.65rem;
@@ -220,15 +254,71 @@
   }
   .inst-name {
     font-family: 'Cormorant Garamond', serif;
-    font-size: 1.6rem;
+    font-size: 1.5rem;
     font-weight: 400;
     color: var(--white);
+    margin-bottom: 0.5rem;
   }
-  .inst-detail {
-    margin-top: 0.4rem;
+  .inst-desc {
     font-size: 0.82rem;
     color: var(--muted);
+    line-height: 1.65;
+    margin-bottom: 1rem;
   }
+  .inst-specs {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+  .inst-specs li {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+    padding-left: 0.8rem;
+    border-left: 1px solid var(--border);
+    line-height: 1.5;
+  }
+  .inst-specs li strong {
+    color: var(--white);
+    font-weight: 400;
+  }
+
+  /* ── SOFTWARE SECTION ── */
+  .software-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-top: 2rem;
+  }
+  .software-block {
+    border: 1px solid var(--border);
+    padding: 1.8rem;
+  }
+  .software-block-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1rem;
+  }
+  .software-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.8rem;
+  }
+  .software-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    padding: 0.3rem 0.75rem;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .software-tag:hover { border-color: var(--accent); color: var(--white); }
 
   /* ── SECTIONS ── */
   section {
@@ -485,8 +575,8 @@
     .nav-links a { display: block; padding: 0.75rem 1.5rem; font-size: 0.85rem; }
     .hero { padding: 8rem 1.5rem 4rem; }
     section { padding: 4rem 1.5rem; }
-    .instruments-strip { flex-direction: column; }
-    .instrument-card { border-right: none; border-bottom: 1px solid var(--border); }
+    .inst-grid { grid-template-columns: 1fr; }
+    .software-grid { grid-template-columns: 1fr; }
     .stats-row { grid-template-columns: 1fr 1fr; }
     .workflow { flex-direction: column; }
     .workflow::before { display: none; }
@@ -530,24 +620,135 @@
   </div>
 </div>
 
-<!-- INSTRUMENTS STRIP -->
-<div class="instruments-strip" id="instruments">
-  <div class="instrument-card reveal">
-    <p class="inst-label">Primary Platform</p>
-    <p class="inst-name">Orbitrap Exploris 240</p>
-    <p class="inst-detail">FAIMS Pro · 480 000 resolving power · DDA / DIA</p>
-  </div>
-  <div class="instrument-card reveal">
-    <p class="inst-label">Secondary Platform</p>
-    <p class="inst-name">Orbitrap Exploris 120</p>
-    <p class="inst-detail">120 000 resolving power · Targeted & untargeted</p>
-  </div>
-  <div class="instrument-card reveal">
-    <p class="inst-label">Separation</p>
-    <p class="inst-name">Polar HILIC</p>
-    <p class="inst-detail">Optimised for polar metabolites · ESI+/−</p>
-  </div>
-</div>
+<!-- INSTRUMENTS -->
+<section id="instruments">
+  <p class="section-tag reveal">Instrumentation</p>
+  <h2 class="reveal">State-of-the-art<br>analytical platforms</h2>
+
+  <div class="inst-grid">
+
+    <!-- Exploris 240 -->
+    <div class="inst-full-card reveal">
+      <div class="inst-photo">
+        <!--
+          TO ADD A PHOTO:
+          1. Copy your image file into the images/ folder (e.g. images/exploris-240.jpg)
+          2. Replace the <div class="inst-photo-placeholder"> block below with:
+             <img src="images/exploris-240.jpg" alt="Orbitrap Exploris 240">
+        -->
+        <div class="inst-photo-placeholder">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="2" y="3" width="20" height="14" rx="1"/><path d="M8 21h8M12 17v4"/></svg>
+          <span>images/exploris-240.jpg</span>
+        </div>
+      </div>
+      <div class="inst-full-body">
+        <p class="inst-label">Primary Platform</p>
+        <p class="inst-name">Orbitrap Exploris 240</p>
+        <p class="inst-desc">Hybrid quadrupole-Orbitrap optimised for untargeted metabolomics. Coupled to Vanquish UHPLC in HILIC mode for deep polar metabolome coverage in positive and negative ionisation.</p>
+        <ul class="inst-specs">
+          <li><strong>Resolution</strong> up to 480 000 FWHM @ m/z 200</li>
+          <li><strong>FAIMS Pro</strong> interface for gas-phase ion separation</li>
+          <li><strong>DDA &amp; DIA</strong> acquisition modes</li>
+          <li><strong>HCD</strong> fragmentation for MS² identification</li>
+          <li><strong>ESI +/−</strong> polarity switching</li>
+          <li><strong>Use case</strong> Untargeted discovery, lipid profiling</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Exploris 120 -->
+    <div class="inst-full-card reveal">
+      <div class="inst-photo">
+        <!--
+          TO ADD A PHOTO:
+          1. Copy your image file into the images/ folder (e.g. images/exploris-120.jpg)
+          2. Replace the <div class="inst-photo-placeholder"> block below with:
+             <img src="images/exploris-120.jpg" alt="Orbitrap Exploris 120">
+        -->
+        <div class="inst-photo-placeholder">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="2" y="3" width="20" height="14" rx="1"/><path d="M8 21h8M12 17v4"/></svg>
+          <span>images/exploris-120.jpg</span>
+        </div>
+      </div>
+      <div class="inst-full-body">
+        <p class="inst-label">Secondary Platform</p>
+        <p class="inst-name">Orbitrap Exploris 120</p>
+        <p class="inst-desc">Compact Orbitrap system for high-throughput targeted and semi-targeted analyses. Ideal for quantitative studies requiring robust reproducibility across large sample cohorts.</p>
+        <ul class="inst-specs">
+          <li><strong>Resolution</strong> up to 120 000 FWHM @ m/z 200</li>
+          <li><strong>PRM</strong> parallel reaction monitoring for quantitation</li>
+          <li><strong>High throughput</strong> optimised cycle time for large batches</li>
+          <li><strong>ESI +/−</strong> polarity switching</li>
+          <li><strong>Use case</strong> Targeted quantitation, large cohort studies</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- UHPLC / HILIC -->
+    <div class="inst-full-card reveal">
+      <div class="inst-photo">
+        <!--
+          TO ADD A PHOTO:
+          1. Copy your image file into the images/ folder (e.g. images/uhplc.jpg)
+          2. Replace the <div class="inst-photo-placeholder"> block below with:
+             <img src="images/uhplc.jpg" alt="Vanquish UHPLC">
+        -->
+        <div class="inst-photo-placeholder">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="2" y="3" width="20" height="14" rx="1"/><path d="M8 21h8M12 17v4"/></svg>
+          <span>images/uhplc.jpg</span>
+        </div>
+      </div>
+      <div class="inst-full-body">
+        <p class="inst-label">Chromatographic Separation</p>
+        <p class="inst-name">Vanquish UHPLC · HILIC</p>
+        <p class="inst-desc">Ultra-high performance liquid chromatography with polar HILIC columns, purpose-built for retaining and separating the hydrophilic metabolites that reversed-phase methods miss.</p>
+        <ul class="inst-specs">
+          <li><strong>Pressure</strong> up to 1500 bar, biocompatible flow path</li>
+          <li><strong>HILIC mode</strong> nucleotides, amino acids, organic acids, sugar phosphates</li>
+          <li><strong>RP mode</strong> lipid and non-polar metabolite profiling</li>
+          <li><strong>Column temp.</strong> precise thermostatting for reproducibility</li>
+          <li><strong>Use case</strong> Polar metabolome, central carbon metabolism</li>
+        </ul>
+      </div>
+    </div>
+
+  </div><!-- /.inst-grid -->
+
+  <!-- SOFTWARE & DATABASES -->
+  <p class="section-tag reveal" style="margin-top:4rem;">Software &amp; Databases</p>
+  <div class="software-grid reveal">
+
+    <div class="software-block">
+      <p class="software-block-title">Data Processing</p>
+      <p style="font-size:0.83rem;color:var(--muted);line-height:1.65;">Open-source and vendor pipelines for feature detection, alignment, and statistical analysis.</p>
+      <div class="software-tags">
+        <span class="software-tag">MZmine 3</span>
+        <span class="software-tag">Thermo Xcalibur</span>
+        <span class="software-tag">FreeStyle</span>
+        <span class="software-tag">MetaboAnalyst</span>
+        <span class="software-tag">R / Bioconductor</span>
+        <span class="software-tag">GNPS</span>
+        <span class="software-tag">SIRIUS 6</span>
+      </div>
+    </div>
+
+    <div class="software-block">
+      <p class="software-block-title">Reference Databases</p>
+      <p style="font-size:0.83rem;color:var(--muted);line-height:1.65;">Annotation is cross-referenced against curated public databases and our in-house spectral library.</p>
+      <div class="software-tags">
+        <span class="software-tag">HMDB</span>
+        <span class="software-tag">LIPID MAPS</span>
+        <span class="software-tag">SwissLipids</span>
+        <span class="software-tag">ChEBI</span>
+        <span class="software-tag">KEGG</span>
+        <span class="software-tag">Reactome</span>
+        <span class="software-tag">In-house MS² library</span>
+      </div>
+    </div>
+
+  </div><!-- /.software-grid -->
+
+</section><!-- /#instruments -->
 
 <!-- ABOUT -->
 <section id="about">
@@ -565,6 +766,17 @@
   <!-- PI Block -->
   <div style="display:grid;grid-template-columns:1fr 2fr;gap:3rem;margin-top:3rem;padding:2.5rem;border:1px solid var(--border);background:var(--surface);" class="reveal">
     <div>
+      <!--
+        TO ADD A PORTRAIT PHOTO:
+        1. Copy your image file into the images/ folder (e.g. images/christian-frezza.jpg)
+        2. Replace the placeholder div below with:
+           <img src="images/christian-frezza.jpg" alt="Prof. Dr. Christian Frezza"
+                style="width:100%;aspect-ratio:1/1;object-fit:cover;object-position:top;display:block;margin-bottom:1.5rem;filter:grayscale(15%);">
+      -->
+      <div style="width:100%;aspect-ratio:1/1;background:#0a0a0a;border:1px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.6rem;margin-bottom:1.5rem;">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="1"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+        <span style="font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.15em;text-transform:uppercase;color:#333;">images/christian-frezza.jpg</span>
+      </div>
       <p style="font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--accent);margin-bottom:0.6rem;">Group Leader</p>
       <p style="font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:400;color:var(--white);margin-bottom:0.4rem;">Prof. Dr.<br>Christian Frezza</p>
       <p style="font-size:0.82rem;color:var(--muted);line-height:1.6;">Alexander von Humboldt Professor of Metabolomics in Ageing</p>
