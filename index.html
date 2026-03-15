@@ -98,10 +98,27 @@
     position: relative;
     z-index: 1;
     min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    padding: 10rem 4rem 6rem;
+    gap: 2rem;
+  }
+  .hero-text {
     display: flex;
     flex-direction: column;
+  }
+  .hero-visual {
+    display: flex;
     justify-content: center;
-    padding: 10rem 4rem 6rem;
+    align-items: center;
+    opacity: 0;
+    animation: fadeUp 1.2s 1s forwards;
+  }
+  .mito-svg {
+    width: min(480px, 90%);
+    height: auto;
+    filter: drop-shadow(0 0 32px rgba(0,255,180,0.13));
   }
 
   .hero-eyebrow {
@@ -573,7 +590,8 @@
     .nav-links li { border-bottom: 1px solid var(--border); }
     .nav-links li:last-child { border-bottom: none; }
     .nav-links a { display: block; padding: 0.75rem 1.5rem; font-size: 0.85rem; }
-    .hero { padding: 8rem 1.5rem 4rem; }
+    .hero { padding: 8rem 1.5rem 4rem; grid-template-columns: 1fr; }
+    .hero-visual { display: none; }
     section { padding: 4rem 1.5rem; }
     .inst-grid { grid-template-columns: 1fr; }
     .software-grid { grid-template-columns: 1fr; }
@@ -608,15 +626,46 @@
 
 <!-- HERO -->
 <div class="hero">
-  <p class="hero-eyebrow">Metabolomics Core Facility · University of Cologne</p>
-  <h1>Precision<br><em>metabolomics</em><br>at scale</h1>
-  <p class="hero-sub">
-    Polar HILIC analysis coupled to high-resolution Orbitrap mass spectrometry.
-    Quantitative, reproducible, and publication-ready data for your research.
-  </p>
-  <div class="hero-cta">
-    <a href="#workflow" class="btn btn-primary">Submit Samples →</a>
-    <a href="#services" class="btn btn-ghost">Our Services</a>
+  <div class="hero-text">
+    <p class="hero-eyebrow">Metabolomics Core Facility · University of Cologne</p>
+    <h1>Precision<br><em>metabolomics</em><br>at scale</h1>
+    <p class="hero-sub">
+      Polar HILIC analysis coupled to high-resolution Orbitrap mass spectrometry.
+      Quantitative, reproducible, and publication-ready data for your research.
+    </p>
+    <div class="hero-cta">
+      <a href="#workflow" class="btn btn-primary">Submit Samples →</a>
+      <a href="#services" class="btn btn-ghost">Our Services</a>
+    </div>
+  </div>
+
+  <div class="hero-visual">
+    <svg class="mito-svg" viewBox="0 0 500 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Outer membrane -->
+      <ellipse cx="250" cy="250" rx="210" ry="140" stroke="#00ffb4" stroke-width="2" stroke-opacity="0.55"/>
+      <!-- Inner membrane main body -->
+      <ellipse cx="250" cy="250" rx="175" ry="108" stroke="#00ffb4" stroke-width="1.5" stroke-opacity="0.35"/>
+      <!-- Cristae folds -->
+      <path d="M115 230 Q145 195 145 250 Q145 305 115 270" stroke="#00ffb4" stroke-width="1.5" stroke-opacity="0.5" fill="none" stroke-linecap="round"/>
+      <path d="M155 210 Q185 175 185 250 Q185 325 155 290" stroke="#00ffb4" stroke-width="1.5" stroke-opacity="0.5" fill="none" stroke-linecap="round"/>
+      <path d="M200 200 Q228 165 228 250 Q228 335 200 300" stroke="#00ffb4" stroke-width="1.5" stroke-opacity="0.5" fill="none" stroke-linecap="round"/>
+      <path d="M245 198 Q270 163 270 250 Q270 337 245 302" stroke="#00ffb4" stroke-width="1.5" stroke-opacity="0.5" fill="none" stroke-linecap="round"/>
+      <path d="M290 200 Q315 168 315 250 Q315 332 290 300" stroke="#00ffb4" stroke-width="1.5" stroke-opacity="0.45" fill="none" stroke-linecap="round"/>
+      <path d="M330 210 Q355 178 355 250 Q355 322 330 290" stroke="#00ffb4" stroke-width="1.5" stroke-opacity="0.4" fill="none" stroke-linecap="round"/>
+      <path d="M368 228 Q390 200 390 250 Q390 300 368 272" stroke="#00ffb4" stroke-width="1.5" stroke-opacity="0.35" fill="none" stroke-linecap="round"/>
+      <!-- Ribosome dots -->
+      <circle cx="175" cy="252" r="3" fill="#00ffb4" fill-opacity="0.45"/>
+      <circle cx="210" cy="235" r="2.5" fill="#00ffb4" fill-opacity="0.4"/>
+      <circle cx="255" cy="228" r="3" fill="#00ffb4" fill-opacity="0.45"/>
+      <circle cx="300" cy="232" r="2.5" fill="#00ffb4" fill-opacity="0.4"/>
+      <circle cx="340" cy="248" r="3" fill="#00ffb4" fill-opacity="0.35"/>
+      <circle cx="220" cy="270" r="2" fill="#00ffb4" fill-opacity="0.3"/>
+      <circle cx="275" cy="272" r="2.5" fill="#00ffb4" fill-opacity="0.35"/>
+      <!-- mtDNA loop -->
+      <ellipse cx="310" cy="258" rx="28" ry="18" stroke="#00ffb4" stroke-width="1.2" stroke-opacity="0.4" stroke-dasharray="4 3" fill="none"/>
+      <!-- Glow overlay -->
+      <ellipse cx="250" cy="250" rx="210" ry="140" stroke="#00ffb4" stroke-width="6" stroke-opacity="0.04"/>
+    </svg>
   </div>
 </div>
 
