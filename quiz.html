@@ -492,7 +492,11 @@ const QUESTIONS = [
   }
 ];
 
+const EXPECTED_TOTAL = 25;
 const TOTAL = QUESTIONS.length;
+if (TOTAL !== EXPECTED_TOTAL) {
+  console.warn(`Question count mismatch: expected ${EXPECTED_TOTAL}, got ${TOTAL}`);
+}
 
 const state = {
   screen: "intro",
@@ -643,7 +647,7 @@ function introView() {
   return `
     <section class="intro">
       <div class="eyebrow">Lab Meeting · Mitochondria Series</div>
-      <h1>The Mitochondria:<br><span style="color:var(--accent)">${TOTAL} Papers That Rewired Biology</span></h1>
+      <h1>The Mitochondria:<br><span style="color:var(--accent)">25 Papers That Rewired Biology</span></h1>
       <p class="subtitle muted">From cristae architecture to innate immunity, from ferroptosis defense to T cell fate — each question anchored to a paper that changed how we think. 30 seconds per question.</p>
       <div class="stats">
         <div class="stat-card"><div class="value">${TOTAL}</div><div class="label muted">Questions</div></div>
