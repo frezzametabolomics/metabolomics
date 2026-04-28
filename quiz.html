@@ -311,16 +311,16 @@ const QUESTIONS = [
     insight: "Less oxygen paradoxically produces more mitochondrial ROS — because electron flow slows, electrons back up at Complex III and leak to O₂ as superoxide. These ROS disable PHDs, which require O₂ as co-substrate anyway. Mitochondria thus function as a cellular oxygen sensor that signals to the nucleus via redox chemistry."
   },
   {
-    q: "Sliter et al. (2018, Nature) showed that PINK1/Parkin mitophagy protects against neuroinflammation in Parkinson's disease models. What happens to mtDNA when mitophagy fails under mitochondrial stress?",
+    q: "West et al. (2015, Nature) and Rongvaux et al. (2014, Nature) showed that mitochondrial DNA released into the cytoplasm activates innate immune signaling. What is the molecular sensor and why is cytoplasmic mtDNA inflammatory?",
     options: [
-      "Uncleared mtDNA accumulates in the nucleus and disrupts nuclear gene expression via competition",
-      "mtDNA leaks into the cytoplasm, where it activates the cGAS-STING innate immune pathway, driving interferon and inflammatory signaling",
-      "Cytoplasmic mtDNA is packaged into exosomes that trigger systemic but not local neuroinflammation",
-      "Oxidized mtDNA directly activates the NLRP3 inflammasome via TLR9 without cGAS involvement"
+      "TLR9 in endosomes senses cytoplasmic mtDNA directly — the same receptor that detects bacterial DNA during infection",
+      "cGAS detects cytoplasmic mtDNA and produces cGAMP, activating STING and driving type I interferon and NF-κB responses — because mtDNA is unmethylated and structurally resembles bacterial DNA, a remnant of its prokaryotic ancestry",
+      "The NLRP3 inflammasome is activated by cytoplasmic mtDNA via an interaction with cardiolipin exposed on the outer leaflet of damaged mitochondria",
+      "RIG-I detects cytoplasmic mtDNA by mistaking its D-loop region for double-stranded RNA produced during viral replication"
     ],
     answer: 1,
-    paper: "Sliter et al. (2018) Nature",
-    insight: "When PINK1-KO mice exercise (a mitochondrial stressor), mtDNA escapes damaged mitochondria, activates cGAS-STING, and drives neuroinflammation. Deleting STING rescued the phenotype. This connected Parkinson's disease genetics to innate immunity for the first time — parkinsonism may partly be a sterile inflammatory disease."
+    paper: "West et al. (2015) Nature 520:553–557; Rongvaux et al. (2014) Nature 513:503–508",
+    insight: "Mitochondria are endosymbiotic bacteria — their DNA retains CpG motifs and lacks the methylation patterns that mark 'self' nuclear DNA. When mtDNA escapes into the cytoplasm during mitochondrial stress or failed mitophagy, cGAS reads it as a danger signal and triggers STING. This is why autoinflammatory conditions like Aicardi-Goutières syndrome and SLE involve cGAS-STING activation — the immune system reacting to its own mitochondrial DNA."
   },
   {
     q: "Buck et al. (2016, Immunity) showed that mitochondrial morphology in CD8⁺ T cells is not merely a consequence of metabolic state — it is a determinant of cell fate. What is the relationship?",
