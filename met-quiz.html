@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Metabolism Quiz · Frezza Metabolomics</title>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body style="margin:0;">
+  <div id="root"></div>
+
+  <script type="text/babel">
+const { useState, useEffect, useRef } = React;
+
+const QUESTIONS = [
+  {
+    q: "IDH1/2 mutations in glioma and AML produce 2-hydroxyglutarate (2-HG) at millimolar concentrations. What does 2-HG do to the epigenome?",
+    options: [
+      "Activates TET DNA demethylases, reducing CpG methylation",
+      "Competitively inhibits α-KG–dependent dioxygenases (TETs, KDMs), causing hypermethylation",
+      "Increases nuclear acetyl-CoA, boosting histone acetylation",
+      "Activates AMPK, promoting chromatin opening"
+    ],
+    answer: 1,
+    paper: "Dang et al. (2009) Nature; Ward et al. (2010) Cancer Cell",
+    insight: "2-HG is structurally similar to α-KG and outcompetes it — a neomorphic enzyme product acting as an epigenetic poison."
+  },
+  {
+    q: "Tannahill et al. (2013, Nature) used LC-MS to show that LPS-activated macrophages accumulate a TCA cycle intermediate that stabilizes HIF-1α even under normal oxygen. Which metabolite?",
+    options: ["Fumarate", "Citrate", "Succinate", "α-Ketoglutarate"],
+    answer: 2,
+    paper: "Tannahill et al. (2013) Nature",
+    insight: "Succinate accumulates because SDH is suppressed during inflammatory activation — it then inhibits PHDs, locking in HIF-1α and IL-1β transcription."
+  },
+  {
+    q: "Sullivan et al. and Birsoy et al. (both 2015, Cell) independently showed that the true growth-limiting metabolite when mitochondrial ETC is inhibited is not ATP. What is it?",
+    options: ["NADH", "Aspartate", "Glutamine", "Citrate"],
+    answer: 1,
+    paper: "Sullivan et al. (2015) Cell; Birsoy et al. (2015) Cell",
+    insight: "ETC inhibition stops aspartate synthesis because it requires OAA from the TCA cycle. Adding aspartate rescues proliferation even without ATP recovery."
+  },
+  {
+    q: "Wellen et al. (2009, Science) showed that nuclear ATP-citrate lyase (ACLY) connects glucose catabolism to a specific epigenetic mark. Which one?",
+    options: [
+      "H3K27me3 (histone methylation)",
+      "H3K9ac and H3K27ac (histone acetylation)",
+      "5-methylcytosine (DNA methylation)",
+      "H2AK119ub (histone ubiquitination)"
+    ],
+    answer: 1,
+    paper: "Wellen et al. (2009) Science",
+    insight: "ACLY in the nucleus generates acetyl-CoA directly from citrate. Glucose availability literally controls the histone acetylation landscape."
+  },
+  {
+    q: "Mentch et al. (2015, Cell Metabolism) showed that restricting one specific amino acid in the diet directly reduces histone methylation marks. Which amino acid?",
+    options: ["Glutamine", "Serine", "Methionine", "Arginine"],
+    answer: 2,
+    paper: "Mentch et al. (2015) Cell Metabolism",
+    insight: "Methionine is the sole donor of the methyl group in SAM. When dietary Met drops, SAM drops, and histone methyltransferases have less substrate."
+  },
+  {
+    q: "Mills et al. (2018, Cell) showed that itaconate, produced by ACOD1/IRG1 in macrophages, electrophilically modifies KEAP1 cysteines. What does this activate?",
+    options: ["mTOR pathway", "NRF2 antioxidant response", "NF-κB inflammatory cascade", "JAK-STAT1 interferon response"],
+    answer: 1,
+    paper: "Mills et al. (2018) Cell",
+    insight: "Itaconate is an endogenous anti-inflammatory brake. By alkylating KEAP1, it releases NRF2, which drives antioxidant and anti-inflammatory gene programs."
+  },
+  {
+    q: "Metallo et al. (2012, Nature) used [U-¹³C₅]-glutamine tracing to show that under hypoxia, cancer cells run glutamine through the TCA cycle in reverse. What does this produce?",
+    options: [
+      "Glucose via gluconeogenesis",
+      "Citrate and fatty acids via reductive carboxylation",
+      "Serine via one-carbon metabolism",
+      "Purines via de novo synthesis"
+    ],
+    answer: 1,
+    paper: "Metallo et al. (2012) Nature; Mullen et al. (2012) Nature Genetics",
+    insight: "IDH2 runs backwards under hypoxia: αKG + CO₂ → isocitrate → citrate. This citrate is exported for fatty acid synthesis — proliferation without oxygen."
+  },
+  {
+    q: "Zhang et al. (2019, Nature) discovered a new class of histone modification produced directly from a metabolite long dismissed as a glycolytic waste product. What is this modification?",
+    options: [
+      "Histone succinylation from succinate",
+      "Histone crotonylation from crotonate",
+      "Histone lactylation from lactate",
+      "Histone propionylation from propionate"
+    ],
+    answer: 2,
+    paper: "Zhang et al. (2019) Nature",
+    insight: "Lactate, far from being inert waste, is a signaling molecule that modifies histones and activates homeostatic gene programs during high glycolytic flux."
+  },
+  {
+    q: "Possemato et al. (2011, Nature) showed PHGDH (phosphoglycerate dehydrogenase) is amplified in ER-negative breast cancer. What does PHGDH do?",
+    options: [
+      "Synthesizes glutathione from glycine",
+      "Diverts glycolytic flux into the serine biosynthesis pathway",
+      "Regenerates NAD+ from NADH in the cytoplasm",
+      "Produces acetyl-CoA from pyruvate in mitochondria"
+    ],
+    answer: 1,
+    paper: "Possemato et al. (2011) Nature; Locasale et al. (2011) Nature Genetics",
+    insight: "The serine synthesis pathway branches off glycolysis at 3-phosphoglycerate. PHGDH overexpression rewires ~10% of glycolytic flux into serine and one-carbon units."
+  },
+  {
+    q: "Mayers et al. (2016, Nature) measured plasma metabolites in pre-diagnostic PDAC patients and found that branched-chain amino acids (BCAAs) are dramatically reduced years before diagnosis. Why?",
+    options: [
+      "The pancreas stops producing digestive enzymes for BCAA absorption",
+      "The developing tumor triggers systemic muscle proteolysis to fuel its own growth",
+      "Patients unconsciously reduce protein intake due to early satiety",
+      "Mutant KRAS upregulates BCAA catabolism in cancer cells"
+    ],
+    answer: 1,
+    paper: "Mayers et al. (2016) Nature",
+    insight: "This is a metabolic biomarker of remote tumor demand — muscle wasting as a metabolic 'broadcast' signal from the tumor. BCAA decline precedes imaging-detectable disease."
+  },
+  {
+    q: "Dixon et al. (2012, Cell) described ferroptosis — a form of regulated cell death driven by iron-dependent lipid peroxidation. Which system is the primary defense against it?",
+    options: [
+      "BCL-2 family anti-apoptotic proteins",
+      "SOD2/catalase mitochondrial antioxidants",
+      "GPX4 (glutathione peroxidase 4) / GSH system",
+      "NRF2-driven thioredoxin reductase"
+    ],
+    answer: 2,
+    paper: "Dixon et al. (2012) Cell",
+    insight: "GPX4 is the only enzyme that can reduce phospholipid hydroperoxides. When GSH is depleted (e.g., by xCT inhibition or cystine starvation), GPX4 fails and ferroptosis ensues."
+  },
+  {
+    q: "Youm et al. (2015, Nature Medicine) showed that a ketone body produced during fasting or ketogenic diet directly inhibits a major inflammatory complex. Which ketone and which complex?",
+    options: [
+      "Acetoacetate inhibits mTORC1",
+      "β-Hydroxybutyrate inhibits the NLRP3 inflammasome",
+      "Acetone inhibits NF-κB nuclear translocation",
+      "β-Hydroxybutyrate inhibits the proteasome"
+    ],
+    answer: 1,
+    paper: "Youm et al. (2015) Nature Medicine",
+    insight: "BHB blocks NLRP3 by preventing K+ efflux and ASC speck formation. This provides a molecular link between caloric restriction and reduced inflammasome-driven diseases."
+  },
+  {
+    q: "Sciacovelli et al. (2016, Nature) showed that fumarate hydratase (FH) loss in renal cancer causes fumarate accumulation, leading to a specific epigenetic change. What is the mechanism?",
+    options: [
+      "Fumarate activates DNMT3A, increasing DNA methylation",
+      "Fumarate inhibits α-KG–dependent KDM histone demethylases → histone hypermethylation",
+      "Fumarate inhibits HDAC1, causing histone hyperacetylation",
+      "Fumarate activates EZH2, increasing H3K27me3"
+    ],
+    answer: 1,
+    paper: "Sciacovelli et al. (2016) Nature",
+    insight: "Like 2-HG, fumarate acts as an oncometabolite by outcompeting αKG. The epigenetic remodeling it causes is sufficient to drive epithelial-mesenchymal transition."
+  },
+  {
+    q: "DeBerardinis et al. (2007, Mol Cell) traced [U-¹³C₅]-glutamine in glioblastoma cells and found labeled carbons appearing in a metabolite class no one expected. Where did they end up?",
+    options: [
+      "In DNA nucleobases via de novo purine synthesis",
+      "In fatty acids via TCA-derived citrate",
+      "In serine via reverse transsulfuration",
+      "In glucose via gluconeogenesis"
+    ],
+    answer: 1,
+    paper: "DeBerardinis et al. (2007) Mol Cell",
+    insight: "Glutamine feeds the TCA cycle (anaplerosis), generating citrate which is exported and cleaved by ACLY to acetyl-CoA for fatty acid synthesis. Tumor cells eat glutamine to make fat."
+  },
+  {
+    q: "Ma et al. (2017, Nature Immunology) showed serine is not just a building block for T cells — it supports a specific biosynthetic process essential for rapid proliferation. What is it?",
+    options: [
+      "Cholesterol synthesis via the mevalonate pathway",
+      "Nucleotide synthesis via one-carbon/folate metabolism",
+      "Glycogen synthesis as energy reserve",
+      "Ceramide synthesis for membrane expansion"
+    ],
+    answer: 1,
+    paper: "Ma et al. (2017) Nature Immunology",
+    insight: "Serine donates one-carbon units to THF, producing 10-formyl-THF for de novo purine synthesis. Without serine, activated T cells cannot make enough DNA for rapid clonal expansion."
+  },
+  {
+    q: "Vander Heiden et al. (2009, Science) argued that the Warburg effect — aerobic glycolysis — is not primarily about energy production. What is the real advantage for proliferating cells?",
+    options: [
+      "Faster ATP generation compared to OXPHOS at high flux",
+      "Avoidance of mitochondrial ROS that would damage DNA",
+      "Carbon and reducing equivalents (NADPH) for biosynthesis of macromolecules",
+      "Prevention of apoptosis via cytochrome c sequestration"
+    ],
+    answer: 2,
+    paper: "Vander Heiden et al. (2009) Science",
+    insight: "Proliferating cells need to double their mass before dividing. OXPHOS burns everything for ATP; glycolysis preserves carbons as biosynthetic precursors. Growth is not an energy problem."
+  },
+  {
+    q: "Ben-Sahra et al. (2013, Science) showed that mTORC1 promotes cell growth beyond protein synthesis. It also directly stimulates de novo synthesis of what?",
+    options: ["Cholesterol and sterols", "Fatty acids via SREBP", "Purines via the pentose phosphate pathway", "Ceramides for membrane integrity"],
+    answer: 2,
+    paper: "Ben-Sahra et al. (2013) Science",
+    insight: "mTORC1 phosphorylates and activates ATIC and PFAS in the purine synthesis pathway. You cannot replicate DNA without purines — mTOR coordinates all biosynthetic demands simultaneously."
+  },
+  {
+    q: "Intlekofer et al. (2015, Nature) showed that 2-HG can accumulate without any IDH mutation. Under which conditions does this happen?",
+    options: [
+      "Amino acid starvation — BCAA catabolism produces 2-HG as byproduct",
+      "Hypoxia combined with acidic pH — enzymatic and non-enzymatic reduction of αKG",
+      "Mitochondrial uncoupling — excess NADH drives reverse IDH",
+      "High glucose — hexosamine pathway generates 2-HG as side product"
+    ],
+    answer: 1,
+    paper: "Intlekofer et al. (2015) Nature",
+    insight: "This challenges the assumption that 2-HG is exclusively oncogenic. Normal hypoxic and acidic microenvironments can drive 2-HG accumulation and local epigenetic changes."
+  },
+  {
+    q: "Gomes et al. (2013, Cell) showed NMN supplementation in aged mice restores mitochondrial function. The proposed mechanism centers on which metabolite ratio?",
+    options: [
+      "ATP/ADP — restoring energy charge",
+      "NAD⁺/NADH — age-related NAD⁺ decline impairs sirtuins and PARP",
+      "NADP⁺/NADPH — restored antioxidant capacity",
+      "Acetyl-CoA/CoA — recovered mitochondrial import capacity"
+    ],
+    answer: 1,
+    paper: "Gomes et al. (2013) Cell",
+    insight: "NAD⁺ declines with age across multiple tissues. SIRT1 (which requires NAD⁺) can no longer suppress pseudo-hypoxia programs. NMN restores NAD⁺ and reverses this aging hallmark."
+  },
+  {
+    q: "Kamphorst et al. (2015, PNAS) showed that nutrient-deprived pancreatic cancer cells find an unconventional way to acquire amino acids from their environment. What is it?",
+    options: [
+      "Autophagy of their own organelles",
+      "Macropinocytosis of extracellular protein, degraded in lysosomes",
+      "Uptake of free amino acids via upregulated SLC transporters",
+      "Transfer of amino acids from stromal cells via gap junctions"
+    ],
+    answer: 1,
+    paper: "Kamphorst et al. (2015) PNAS; Commisso et al. (2013) Nature",
+    insight: "Mutant KRAS upregulates macropinocytosis — cells literally gulp extracellular fluid containing albumin and other proteins, digest them, and use the amino acids. A primitive survival strategy."
+  },
+  {
+    q: "Ghergurovich et al. (2021, Nature Metabolism) validated a specific isotopic labeling pattern from [U-¹³C₅]-methionine tracing. M+4 methionine labeling indicates what?",
+    options: [
+      "Methionine degradation through the transsulfuration pathway",
+      "A closed methionine cycle: Met → SAM → SAH → Hcy → Met (via BHMT or MS)",
+      "Incomplete labeling from isotope dilution by de novo synthesis",
+      "Folate-mediated one-carbon transfer back to homocysteine"
+    ],
+    answer: 1,
+    paper: "Ghergurovich et al. (2021) Nature Metabolism",
+    insight: "When [U-¹³C₅]-Met is remethylated from Hcy, the product inherits 4 of the original 5 carbons (the methyl group is lost as SAM, replaced by unlabeled CH₃). M+4 = confirmed active Met cycle."
+  },
+  {
+    q: "Ringel et al. (2020, Nature) showed that high-fat diet impairs CD8⁺ T cell antitumor function. What is the metabolic mechanism in T cells?",
+    options: [
+      "Excess fatty acids inhibit glycolysis by blocking hexokinase",
+      "Lipid overload forces T cells into FAO over glycolysis, reducing their effector capacity",
+      "Dietary lipids directly bind and inhibit TCR signaling",
+      "Fatty acids suppress mitochondrial biogenesis via mTOR"
+    ],
+    answer: 1,
+    paper: "Ringel et al. (2020) Nature",
+    insight: "CD8⁺ T cells in high-fat conditions accumulate lipid droplets and shift to FAO. This metabolic state is incompatible with the glycolysis-dependent cytokine production needed to kill tumors."
+  },
+  {
+    q: "Losman et al. (2013, Science) showed that 2-HG blocks AML cell differentiation by inhibiting a specific enzyme. Which one, and what would normally happen without 2-HG?",
+    options: [
+      "Inhibits DNMT3A — DNA would be demethylated, allowing differentiation genes to activate",
+      "Inhibits TET2 — unmethylated promoters would activate differentiation programs",
+      "Inhibits KDM6A — H3K27 would be demethylated, opening chromatin at lineage genes",
+      "Inhibits PHD2 — HIF-1α would be degraded, reducing glycolytic gene expression"
+    ],
+    answer: 1,
+    paper: "Losman et al. (2013) Science",
+    insight: "TET2 normally converts 5-methylcytosine to 5-hydroxymethylcytosine, initiating demethylation at differentiation gene promoters. 2-HG freezes leukemia cells in a self-renewing, undifferentiated state."
+  },
+  {
+    q: "Tannahill et al. (2013) established succinate as an inflammatory signal. The SUCNR1 receptor senses extracellular succinate. What is the functional consequence in inflammation?",
+    options: [
+      "T cell exhaustion via PD-1 upregulation",
+      "Dendritic cell maturation and IL-12 secretion",
+      "Macrophage activation amplifying IL-1β and promoting inflammation",
+      "NK cell cytotoxicity enhancement"
+    ],
+    answer: 2,
+    paper: "Tannahill et al. (2013) Nature; Littlewood-Evans et al. (2016) J Exp Med",
+    insight: "Succinate released by damaged cells acts as a danger signal, amplifying the inflammatory response via SUCNR1 on macrophages. Metabolite as a damage-associated molecular pattern (DAMP)."
+  },
+  {
+    q: "Kory et al. (2020, Science) and Girardi et al. (2020, Science) simultaneously identified the long-sought mitochondrial NAD⁺ transporter (MCART1/SLC25A51). How was it found?",
+    options: [
+      "Structural homology to known yeast NAD⁺ transporters",
+      "CRISPR-based genetic screen for genes required when cytoplasmic NAD⁺ synthesis is blocked",
+      "Proximity labeling (BioID) of the inner mitochondrial membrane proteome",
+      "Co-immunoprecipitation with Complex I components"
+    ],
+    answer: 1,
+    paper: "Kory et al. (2020) Science; Girardi et al. (2020) Science",
+    insight: "A textbook example of unbiased functional genomics: screen for fitness genes in a specific metabolic context, identify a transporter with no annotated function, confirm by metabolomics. A 50-year mystery solved."
+  }
+];
+
+const TOTAL = QUESTIONS.length;
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function MetQuiz() {
+  const [screen, setScreen] = useState("intro");
+  const [questions, setQuestions] = useState([]);
+  const [current, setCurrent] = useState(0);
+  const [selected, setSelected] = useState(null);
+  const [revealed, setRevealed] = useState(false);
+  const [score, setScore] = useState(0);
+  const [answers, setAnswers] = useState([]);
+  const [timeLeft, setTimeLeft] = useState(30);
+  const [timerActive, setTimerActive] = useState(false);
+  const [darkMode, setDarkMode] = useState(true);
+  const [autoReveal, setAutoReveal] = useState(false);
+  const timerRef = useRef(null);
+  const autoRevealRef = useRef(autoReveal);
+  useEffect(() => { autoRevealRef.current = autoReveal; }, [autoReveal]);
+
+  const ACCENT = "#6ee7b7";
+  const T = darkMode ? {
+    bg: "#0b1120", text: "#e8e0d0", textSub: "#9ca3af", textDim: "#6b7280",
+    heading: "#f0ebe0", cardBg: "rgba(110,231,183,0.05)", cardBorder: "rgba(110,231,183,0.15)",
+    qBg: "rgba(255,255,255,0.03)", qBorder: "rgba(255,255,255,0.08)",
+    optBg: "rgba(255,255,255,0.03)", optBorder: "rgba(255,255,255,0.1)",
+    optHover: "rgba(255,255,255,0.07)", labelBg: "rgba(255,255,255,0.08)", labelColor: "#9ca3af",
+    insightBg: "rgba(96,165,250,0.07)", insightBorder: "rgba(96,165,250,0.2)",
+    trackBg: "rgba(255,255,255,0.08)", dotEmpty: "rgba(255,255,255,0.1)",
+    resultBg: "rgba(255,255,255,0.03)", resultBorder: "rgba(255,255,255,0.08)",
+    toggleIcon: "☀️",
+  } : {
+    bg: "#f5f2eb", text: "#1c1c1c", textSub: "#555", textDim: "#888",
+    heading: "#111", cardBg: "rgba(16,185,129,0.07)", cardBorder: "rgba(16,185,129,0.25)",
+    qBg: "rgba(0,0,0,0.03)", qBorder: "rgba(0,0,0,0.1)",
+    optBg: "rgba(0,0,0,0.02)", optBorder: "rgba(0,0,0,0.13)",
+    optHover: "rgba(0,0,0,0.05)", labelBg: "rgba(0,0,0,0.08)", labelColor: "#555",
+    insightBg: "rgba(59,130,246,0.06)", insightBorder: "rgba(59,130,246,0.22)",
+    trackBg: "rgba(0,0,0,0.08)", dotEmpty: "rgba(0,0,0,0.12)",
+    resultBg: "rgba(0,0,0,0.03)", resultBorder: "rgba(0,0,0,0.1)",
+    toggleIcon: "🌙",
+  };
+
+  const startQuiz = () => {
+    const q = shuffle(QUESTIONS).map(question => {
+      const indexed = question.options.map((opt, i) => ({ opt, correct: i === question.answer }));
+      const shuffled = shuffle(indexed);
+      return { ...question, options: shuffled.map(x => x.opt), answer: shuffled.findIndex(x => x.correct) };
+    });
+    setQuestions(q);
+    setScreen("quiz");
+    setCurrent(0);
+    setSelected(null);
+    setRevealed(false);
+    setScore(0);
+    setAnswers([]);
+    setTimeLeft(30);
+    setTimerActive(true);
+  };
+
+  useEffect(() => {
+    if (timerActive && !revealed && screen === "quiz") {
+      timerRef.current = setInterval(() => {
+        setTimeLeft(t => {
+          if (t <= 1) {
+            clearInterval(timerRef.current);
+            setTimerActive(false);
+            if (autoRevealRef.current) {
+              setRevealed(true);
+              setAnswers(prev => [...prev, { correct: false, selected: null }]);
+            }
+            return 0;
+          }
+          return t - 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(timerRef.current);
+  }, [timerActive, revealed, screen, current]);
+
+  const handleSelect = (idx) => {
+    if (revealed) return;
+    clearInterval(timerRef.current);
+    setTimerActive(false);
+    setSelected(idx);
+    setRevealed(true);
+    const correct = idx === questions[current].answer;
+    if (correct) setScore(s => s + 1);
+    setAnswers(prev => [...prev, { correct, selected: idx }]);
+  };
+
+  const next = () => {
+    if (current + 1 >= questions.length) {
+      setScreen("result");
+    } else {
+      setCurrent(c => c + 1);
+      setSelected(null);
+      setRevealed(false);
+      setTimeLeft(30);
+      setTimerActive(true);
+    }
+  };
+
+  const q = questions[current];
+  const timerPct = (timeLeft / 30) * 100;
+  const timerColor = timeLeft > 15 ? "#4ade80" : timeLeft > 8 ? "#facc15" : "#f87171";
+
+  const getScoreLabel = () => {
+    const pct = score / TOTAL;
+    if (pct === 1) return "Perfect. Are you sure you're not a PI?";
+    if (pct >= 0.8) return "Outstanding. You've clearly been reading.";
+    if (pct >= 0.6) return "Solid — strong foundation in metabolomics literature.";
+    if (pct >= 0.4) return "Decent — but there are papers waiting for you.";
+    return "Time to open PubMed. That's the whole point.";
+  };
+
+  const ToggleBtn = () => (
+    <button onClick={() => setDarkMode(d => !d)} style={{
+      position: "fixed", top: 16, right: 16,
+      background: T.cardBg, border: `1px solid ${T.cardBorder}`,
+      borderRadius: 8, padding: "7px 12px",
+      fontSize: 18, cursor: "pointer", zIndex: 999,
+      transition: "all 0.2s",
+    }} title="Toggle light/dark mode">
+      {T.toggleIcon}
+    </button>
+  );
+
+  return (
+    <div style={{
+      minHeight: "100vh",
+      background: T.bg,
+      fontFamily: "'Georgia', 'Times New Roman', serif",
+      color: T.text,
+      display: "flex", flexDirection: "column",
+      alignItems: "center", justifyContent: "center",
+      padding: "24px 16px", boxSizing: "border-box",
+      transition: "background 0.3s, color 0.3s",
+    }}>
+      <ToggleBtn />
+
+      {screen === "intro" && (
+        <div style={{ maxWidth: 640, width: "100%", textAlign: "center" }}>
+          <div style={{ fontSize: 13, letterSpacing: 5, color: ACCENT, textTransform: "uppercase", marginBottom: 20, opacity: 0.9 }}>
+            Lab Meeting · Metabolomics Series
+          </div>
+          <h1 style={{
+            fontSize: "clamp(30px, 6vw, 54px)",
+            fontWeight: "normal", lineHeight: 1.1,
+            margin: "0 0 16px", color: T.heading, letterSpacing: "-0.5px",
+          }}>
+            Metabolism:<br />
+            <span style={{ color: ACCENT }}>25 Papers That Changed Biology</span>
+          </h1>
+          <p style={{ fontSize: 17, color: T.textSub, lineHeight: 1.75, margin: "0 0 40px" }}>
+            Each question is anchored to a landmark study where mass spectrometry
+            revealed something unexpected. 30 seconds per question. No calculators required.
+          </p>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16, marginBottom: 40 }}>
+            {[["25", "Questions"], ["30s", "Per question"], ["Nature/Cell/Science", "Primary sources"]].map(([val, label]) => (
+              <div key={label} style={{
+                background: T.cardBg, border: `1px solid ${T.cardBorder}`,
+                borderRadius: 8, padding: "16px 8px",
+              }}>
+                <div style={{ fontSize: 22, fontWeight: "bold", color: ACCENT, marginBottom: 4 }}>{val}</div>
+                <div style={{ fontSize: 12, color: T.textDim, letterSpacing: 1, textTransform: "uppercase" }}>{label}</div>
+              </div>
+            ))}
+          </div>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 12, marginBottom: 28 }}>
+            <button onClick={() => setAutoReveal(a => !a)} style={{
+              display: "flex", alignItems: "center", gap: 10,
+              background: autoReveal ? "rgba(250,204,21,0.1)" : T.cardBg,
+              border: autoReveal ? "1px solid #facc15" : "1px solid " + T.textDim,
+              borderRadius: 8, padding: "9px 18px",
+              color: autoReveal ? "#facc15" : T.textDim,
+              fontSize: 13, fontFamily: "inherit",
+              cursor: "pointer", transition: "all 0.2s",
+            }}>
+              <span style={{
+                width: 14, height: 14, borderRadius: "50%",
+                background: autoReveal ? "#facc15" : "transparent",
+                border: autoReveal ? "2px solid #facc15" : "2px solid " + T.textDim,
+                flexShrink: 0, transition: "all 0.2s",
+              }}/>
+              Auto-reveal on timeout
+            </button>
+            <span style={{ fontSize: 12, color: T.textDim, maxWidth: 160, lineHeight: 1.4, textAlign: "left" }}>
+              {autoReveal ? "Timer reveals answer automatically" : "Timer stops — group discusses first"}
+            </span>
+          </div>
+
+          <button onClick={startQuiz} style={{
+            background: ACCENT, color: "#0b1120", border: "none",
+            borderRadius: 8, padding: "15px 52px",
+            fontSize: 16, fontFamily: "inherit", fontWeight: "bold",
+            cursor: "pointer", letterSpacing: 1, textTransform: "uppercase",
+          }}
+            onMouseEnter={e => e.target.style.opacity = "0.85"}
+            onMouseLeave={e => e.target.style.opacity = "1"}
+          >
+            Start Quiz
+          </button>
+        </div>
+      )}
+
+      {screen === "quiz" && q && (
+        <div style={{ maxWidth: 740, width: "100%" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+            <div style={{ fontSize: 14, color: T.textDim, letterSpacing: 2, textTransform: "uppercase" }}>
+              {current + 1} / {TOTAL}
+            </div>
+            <div style={{ fontSize: 15, fontWeight: "bold", color: timerColor, fontFamily: "monospace", transition: "color 0.3s" }}>
+              {revealed ? "—" : `${timeLeft}s`}
+            </div>
+          </div>
+
+          <div style={{ height: 4, background: T.trackBg, borderRadius: 2, marginBottom: 28, overflow: "hidden" }}>
+            <div style={{
+              height: "100%", width: revealed ? "0%" : `${timerPct}%`,
+              background: timerColor, borderRadius: 2,
+              transition: "width 1s linear, background 0.3s",
+            }} />
+          </div>
+
+          <div style={{ display: "flex", gap: 5, marginBottom: 26, flexWrap: "wrap" }}>
+            {questions.map((_, i) => {
+              let bg = T.dotEmpty;
+              if (i < answers.length) bg = answers[i].correct ? "#4ade80" : "#f87171";
+              if (i === current) bg = "#60a5fa";
+              return <div key={i} style={{ width: 9, height: 9, borderRadius: "50%", background: bg, transition: "background 0.3s" }} />;
+            })}
+          </div>
+
+          <div style={{
+            background: T.qBg, border: `1px solid ${T.qBorder}`,
+            borderRadius: 12, padding: "28px 28px 24px", marginBottom: 18,
+          }}>
+            <p style={{ fontSize: 18, lineHeight: 1.7, margin: 0, color: T.heading }}>
+              {q.q}
+            </p>
+          </div>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 22 }}>
+            {q.options.map((opt, i) => {
+              let border = `1px solid ${T.optBorder}`;
+              let bg = T.optBg;
+              let color = T.text;
+              let labelBg = T.labelBg;
+              let labelColor = T.labelColor;
+              if (revealed) {
+                if (i === q.answer) {
+                  border = "1px solid #4ade80"; bg = "rgba(74,222,128,0.08)"; color = "#4ade80";
+                  labelBg = "#4ade80"; labelColor = "#0b1120";
+                } else if (i === selected) {
+                  border = "1px solid #f87171"; bg = "rgba(248,113,113,0.08)"; color = "#f87171";
+                  labelBg = "#f87171"; labelColor = "#fff";
+                }
+              }
+              return (
+                <button key={i} onClick={() => handleSelect(i)} style={{
+                  display: "flex", alignItems: "flex-start", gap: 14,
+                  background: bg, border, borderRadius: 8,
+                  padding: "15px 16px", cursor: revealed ? "default" : "pointer",
+                  textAlign: "left", transition: "all 0.22s",
+                  fontFamily: "inherit", color,
+                }}
+                  onMouseEnter={e => { if (!revealed) e.currentTarget.style.background = T.optHover; }}
+                  onMouseLeave={e => { if (!revealed) e.currentTarget.style.background = T.optBg; }}>
+                  <span style={{
+                    flexShrink: 0, width: 24, height: 24, borderRadius: 4,
+                    background: labelBg, color: labelColor,
+                    fontSize: 12, fontWeight: "bold",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    transition: "all 0.22s",
+                  }}>
+                    {String.fromCharCode(65 + i)}
+                  </span>
+                  <span style={{ fontSize: 16, lineHeight: 1.6 }}>{opt}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          {revealed && (
+            <div style={{
+              background: T.insightBg, border: `1px solid ${T.insightBorder}`,
+              borderRadius: 10, padding: "20px 22px 16px", marginBottom: 18,
+              animation: "fadeIn 0.4s ease",
+            }}>
+              <div style={{ fontSize: 12, color: "#60a5fa", letterSpacing: 3, textTransform: "uppercase", marginBottom: 10 }}>
+                The story behind it
+              </div>
+              <p style={{ margin: "0 0 10px", fontSize: 16, lineHeight: 1.7, color: T.text }}>{q.insight}</p>
+              <div style={{ fontSize: 13, color: T.textDim, fontStyle: "italic" }}>📄 {q.paper}</div>
+            </div>
+          )}
+
+          {!revealed && timeLeft === 0 && (
+            <button onClick={() => {
+              setRevealed(true);
+              setAnswers(prev => [...prev, { correct: false, selected: null }]);
+            }} style={{
+              width: "100%",
+              background: "rgba(250,204,21,0.1)",
+              border: "1px solid #facc15",
+              borderRadius: 8, padding: "14px",
+              color: "#facc15", fontSize: 15,
+              fontFamily: "inherit", cursor: "pointer",
+              letterSpacing: 1.5, textTransform: "uppercase",
+              marginBottom: 10, animation: "fadeIn 0.3s ease",
+            }}
+              onMouseEnter={e => e.currentTarget.style.opacity = "0.75"}
+              onMouseLeave={e => e.currentTarget.style.opacity = "1"}
+            >
+              Reveal Answer
+            </button>
+          )}
+
+          {revealed && (
+            <button onClick={next} style={{
+              width: "100%",
+              background: T.cardBg, border: `1px solid ${ACCENT}`,
+              borderRadius: 8, padding: "14px",
+              color: ACCENT, fontSize: 15,
+              fontFamily: "inherit", cursor: "pointer",
+              letterSpacing: 1.5, textTransform: "uppercase",
+            }}
+              onMouseEnter={e => e.currentTarget.style.opacity = "0.75"}
+              onMouseLeave={e => e.currentTarget.style.opacity = "1"}
+            >
+              {current + 1 < TOTAL ? "Next Question →" : "See Results"}
+            </button>
+          )}
+        </div>
+      )}
+
+      {screen === "result" && (
+        <div style={{ maxWidth: 640, width: "100%", textAlign: "center" }}>
+          <div style={{ fontSize: 13, letterSpacing: 5, color: ACCENT, textTransform: "uppercase", marginBottom: 20 }}>
+            Final Score
+          </div>
+          <div style={{ fontSize: "clamp(64px, 15vw, 104px)", fontWeight: "normal", color: ACCENT, lineHeight: 1, marginBottom: 8 }}>
+            {score}<span style={{ fontSize: "38%", color: T.textDim }}>/{TOTAL}</span>
+          </div>
+          <p style={{ fontSize: 20, color: T.text, marginBottom: 8, fontStyle: "italic" }}>{getScoreLabel()}</p>
+          <p style={{ fontSize: 15, color: T.textDim, marginBottom: 40 }}>{Math.round((score / TOTAL) * 100)}% correct</p>
+          <div style={{
+            background: T.resultBg, border: `1px solid ${T.resultBorder}`,
+            borderRadius: 12, padding: 22, marginBottom: 32, textAlign: "left",
+          }}>
+            <div style={{ fontSize: 12, color: T.textDim, letterSpacing: 3, textTransform: "uppercase", marginBottom: 16 }}>
+              Question breakdown
+            </div>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+              {answers.map((a, i) => (
+                <div key={i} style={{
+                  width: 34, height: 34, borderRadius: 6,
+                  background: a.correct ? "rgba(74,222,128,0.12)" : "rgba(248,113,113,0.12)",
+                  border: `1px solid ${a.correct ? "#4ade80" : "#f87171"}`,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: 12, color: a.correct ? "#4ade80" : "#f87171", fontWeight: "bold",
+                }}>
+                  {i + 1}
+                </div>
+              ))}
+            </div>
+          </div>
+          <button onClick={startQuiz} style={{
+            background: ACCENT, color: "#0b1120", border: "none",
+            borderRadius: 8, padding: "15px 44px",
+            fontSize: 15, fontFamily: "inherit", fontWeight: "bold",
+            cursor: "pointer", letterSpacing: 1, textTransform: "uppercase",
+          }}
+            onMouseEnter={e => e.target.style.opacity = "0.85"}
+            onMouseLeave={e => e.target.style.opacity = "1"}
+          >
+            Play Again (Shuffled)
+          </button>
+          <p style={{marginTop: 18}}><a href="index.html" style={{color: T.textDim}}>← Back to home</a></p>
+        </div>
+      )}
+
+      <style>{`@keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }`}</style>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<MetQuiz />);
+  </script>
+</body>
+</html>
