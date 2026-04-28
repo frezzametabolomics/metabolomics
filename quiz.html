@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mitochondria Quiz · Frezza Metabolomics</title>
+  <style>
+    :root {
+      --accent: #fb923c;
+      --correct: #34d399;
+      --wrong: #f87171;
+      --info: #60a5fa;
+      --warn: #facc15;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      transition: background 0.3s, color 0.3s;
+      min-height: 100vh;
+    }
+
+    body.dark {
+      background: #0d0e14;
+      color: #e8e0d0;
+    }
+
+    body.light {
+      background: #fef9f5;
+      color: #1c1c1c;
+    }
+
+    .page {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+    }
+
+    .container { width: min(740px, 100%); }
+
+    .toggle {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      border-radius: 8px;
+      padding: 7px 12px;
+      font-size: 18px;
+      cursor: pointer;
+      z-index: 99;
+      transition: 0.2s;
+    }
+
+    body.dark .toggle {
+      background: rgba(251, 146, 60, 0.05);
+      border: 1px solid rgba(251, 146, 60, 0.18);
+      color: #e8e0d0;
+    }
+
+    body.light .toggle {
+      background: rgba(251, 146, 60, 0.08);
+      border: 1px solid rgba(234, 88, 12, 0.25);
+      color: #1c1c1c;
+    }
+
+    .eyebrow { font-size: 13px; letter-spacing: 5px; color: var(--accent); text-transform: uppercase; margin-bottom: 20px; }
+    h1 { font-size: clamp(30px, 6vw, 54px); font-weight: normal; line-height: 1.1; margin: 0 0 16px; }
+    .subtitle { font-size: 17px; line-height: 1.75; margin: 0 0 40px; }
+    .intro, .result { text-align: center; }
+    .muted { color: #9ca3af; }
+    body.light .muted { color: #555; }
+
+    .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 40px; }
+    .stat-card { border-radius: 8px; padding: 16px 8px; }
+    body.dark .stat-card { background: rgba(251,146,60,0.05); border: 1px solid rgba(251,146,60,0.18); }
+    body.light .stat-card { background: rgba(251,146,60,0.08); border: 1px solid rgba(234,88,12,0.25); }
+
+    .stat-card .value { font-size: 22px; font-weight: bold; color: var(--accent); }
+    .stat-card .label { font-size: 12px; letter-spacing: 1px; text-transform: uppercase; }
+
+    .button {
+      border-radius: 8px;
+      padding: 14px 22px;
+      font-family: inherit;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-size: 15px;
+      transition: 0.2s;
+    }
+
+    .button-primary {
+      background: var(--accent);
+      color: #0d0e14;
+      border: none;
+      font-weight: bold;
+      padding: 15px 44px;
+    }
+
+    .button-ghost {
+      width: 100%;
+      background: transparent;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+    }
+
+    .button-warn {
+      width: 100%;
+      background: rgba(250,204,21,0.1);
+      border: 1px solid var(--warn);
+      color: var(--warn);
+    }
+
+    .timer-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .timer-value { font: bold 15px monospace; }
+    .progress-track { height: 4px; border-radius: 2px; margin-bottom: 28px; overflow: hidden; }
+    body.dark .progress-track { background: rgba(255,255,255,0.07); }
+    body.light .progress-track { background: rgba(0,0,0,0.08); }
+
+    .progress-fill { height: 100%; transition: width 1s linear, background 0.3s; }
+    .dots { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 26px; }
+    .dot { width: 9px; height: 9px; border-radius: 50%; }
+
+    .q-card { border-radius: 12px; padding: 28px 28px 24px; margin-bottom: 18px; }
+    body.dark .q-card { background: rgba(251,146,60,0.04); border: 1px solid rgba(251,146,60,0.12); }
+    body.light .q-card { background: rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.1); }
+    .q-text { font-size: 18px; line-height: 1.7; margin: 0; }
+
+    .options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 22px; }
+    .opt {
+      display: flex; align-items: flex-start; gap: 14px;
+      border-radius: 8px; padding: 15px 16px;
+      font-family: inherit; text-align: left;
+      transition: 0.2s; cursor: pointer;
+      width: 100%;
+    }
+    body.dark .opt { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.09); color: #e8e0d0; }
+    body.light .opt { background: rgba(0,0,0,0.02); border: 1px solid rgba(0,0,0,0.13); color: #1c1c1c; }
+    .opt:hover { background: rgba(251,146,60,0.07); }
+    .opt:disabled { cursor: default; }
+
+    .badge {
+      flex-shrink: 0; width: 24px; height: 24px; border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: bold;
+    }
+    body.dark .badge { background: rgba(255,255,255,0.07); color: #9ca3af; }
+    body.light .badge { background: rgba(0,0,0,0.08); color: #555; }
+
+    .opt-text { font-size: 16px; line-height: 1.65; }
+
+    .insight {
+      border-radius: 10px; padding: 20px 22px 16px; margin-bottom: 18px;
+      animation: fadeUp 0.35s ease;
+    }
+    body.dark .insight { background: rgba(96,165,250,0.06); border: 1px solid rgba(96,165,250,0.18); }
+    body.light .insight { background: rgba(59,130,246,0.06); border: 1px solid rgba(59,130,246,0.2); }
+
+    .insight-tag { font-size: 12px; color: var(--info); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 10px; }
+    .insight p { margin: 0 0 10px; font-size: 16px; line-height: 1.7; }
+    .paper { font-size: 13px; font-style: italic; }
+
+    .result-score { font-size: clamp(64px, 15vw, 104px); color: var(--accent); line-height: 1; margin-bottom: 8px; }
+    .result-card { border-radius: 12px; padding: 22px; margin-bottom: 28px; text-align: left; }
+    body.dark .result-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); }
+    body.light .result-card { background: rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.1); }
+    .answers { display: flex; flex-wrap: wrap; gap: 6px; }
+    .answer-chip {
+      width: 34px; height: 34px; border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: bold;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 768px) {
+      .stats { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body class="dark">
+  <button id="theme-toggle" class="toggle" title="Toggle light/dark mode">☀️</button>
+  <main class="page"><div id="app" class="container"></div></main>
+
+  <script>
+const QUESTIONS = [
+  {
+    q: "Frezza et al. (2006, Cell) showed that OPA1 does far more than fuse mitochondria. What is OPA1's specific role in controlling cytochrome c release during apoptosis?",
+    options: [
+      "OPA1 directly sequesters cytochrome c in the matrix via electrostatic interaction",
+      "OPA1 oligomers maintain tight cristae junctions, trapping cytochrome c inside cristae; OPA1 cleavage widens these junctions, releasing this pool before BAX even acts",
+      "OPA1 phosphorylates BAX, preventing its insertion into the outer mitochondrial membrane",
+      "OPA1 recruits MCL-1 to cristae membranes, physically blocking cytochrome c egress"
+    ],
+    answer: 1,
+    paper: "Frezza et al. (2006) Cell",
+    insight: "Most cytochrome c is sequestered inside cristae, not floating in the IMS. OPA1 seals cristae junctions. When stress triggers OPA1 cleavage by OMA1/YME1L, junctions open and cytochrome c floods the IMS — this is the first wave of release, independent of BAX pore formation."
+  },
+  {
+    q: "The molecular identity of the mitochondrial pyruvate carrier (MPC) was unknown for decades despite pyruvate import being essential for TCA cycle fueling. How was it finally identified in 2012 by two simultaneous papers?",
+    options: [
+      "Structural homology to known bacterial pyruvate transporters led to direct mammalian identification",
+      "Co-immunoprecipitation with pyruvate dehydrogenase revealed its binding partner",
+      "A yeast genetic screen for mitochondrial metabolite transport mutants identified MPC1/MPC2; mammalian homologs were confirmed by reconstitution in yeast",
+      "Proximity labeling (BioID) of inner mitochondrial membrane proteome pulled it out"
+    ],
+    answer: 2,
+    paper: "Herzig et al. (2012) Science; Bricker et al. (2012) Science",
+    insight: "MPC1 and MPC2 are tiny inner membrane proteins with no recognizable transport domain — they were invisible to homology searches. Without MPC, cells cannot fuel the TCA cycle from glucose, explaining why MPC loss forces cells into aerobic glycolysis and why MPC is a candidate tumor suppressor."
+  },
+  {
+    q: "The mitochondrial calcium uniporter (MCU) was molecularly identified in 2011 by Baughman et al. and De Stefani et al. Beyond calcium buffering, what is the key metabolic consequence of MCU-mediated Ca²⁺ uptake?",
+    options: [
+      "Ca²⁺ directly inhibits Complex I, reducing dangerous electron leak and ROS production",
+      "Ca²⁺ activates three TCA cycle dehydrogenases (PDH, ICDH, OGDH), coupling cytoplasmic activation signals to increased OXPHOS output",
+      "Ca²⁺ prevents cytochrome c release by stabilizing cardiolipin–cytochrome c interactions",
+      "Ca²⁺ drives mitochondrial fission via DRP1 Ser616 phosphorylation"
+    ],
+    answer: 1,
+    paper: "Baughman et al. (2011) Nature; De Stefani et al. (2011) Nature",
+    insight: "MCU is the molecular basis for the 1960s observation that Ca²⁺ accelerates respiration. When a neuron fires or a muscle contracts, cytoplasmic Ca²⁺ spikes enter via MCU and turbocharge TCA flux within seconds — a direct biophysical link between cellular activity and energy supply."
+  },
+  {
+    q: "Narendra et al. showed that PINK1 selectively accumulates on damaged, depolarized mitochondria and recruits Parkin from the cytoplasm. What does Parkin then do to the organelle?",
+    options: [
+      "Directly fuses the damaged mitochondrion with a healthy neighbor for content rescue via MFN1",
+      "Phosphorylates DRP1 at Ser616 to drive fission and isolation of the damaged segment",
+      "Ubiquitinates multiple outer membrane proteins (VDAC, MFN1/2, TOMM20), flagging the mitochondrion for autophagic degradation",
+      "Activates UCP2 to safely dissipate residual membrane potential before fragmentation"
+    ],
+    answer: 2,
+    paper: "Narendra et al. (2008) J Cell Biol; Narendra et al. (2010) PLoS Biology",
+    insight: "PINK1 is normally imported and degraded continuously on healthy mitochondria. Depolarization blocks import, causing PINK1 to accumulate and phosphorylate ubiquitin and Parkin, triggering a self-amplifying ubiquitin cascade. Loss of either PINK1 or Parkin causes Parkinson's disease — failed mitochondrial quality control as neurodegeneration."
+  },
+  {
+    q: "Lapuente-Brun et al. (2013, Science) showed ETC complexes assemble into 'respirasomes' (supercomplexes I+III+IV). What is the proposed functional benefit of this architecture?",
+    options: [
+      "Supercomplexes anchor to cardiolipin-rich cristae regions, preventing lateral diffusion and complex dissociation",
+      "Substrate channeling — NADH and ubiquinol are handed directly between complexes, increasing electron flux efficiency and reducing CoQ/cytochrome c diffusion distance",
+      "Co-assembly allows complexes to share structural subunits, reducing total mitochondrial proteome cost",
+      "Respirasomes physically exclude Complex II to prevent reverse electron transport and ROS generation"
+    ],
+    answer: 1,
+    paper: "Lapuente-Brun et al. (2013) Science; Enríquez lab",
+    insight: "The Enríquez lab also showed that COX7A2L (SCAF1) determines whether CI+CIII+CIV form a full respirasome, and variants in this protein affect metabolic flexibility between substrates. The debate between the 'random collision' and 'solid-state' models is one of the most productive controversies in mitochondrial biology."
+  },
+  {
+    q: "Baysal et al. (2000, Science) identified the first hereditary cancer caused by a germline mutation in an ETC enzyme — predating the IDH/2-HG story by nearly a decade. Which enzyme and cancer?",
+    options: [
+      "Complex I ND5 subunit mutations causing hereditary glioblastoma",
+      "Succinate dehydrogenase subunit B (SDHB) mutations causing hereditary paraganglioma and pheochromocytoma",
+      "Cytochrome bc₁ complex UQCRB mutations causing hereditary renal cell carcinoma",
+      "ATP synthase ATP5A mutations causing hereditary thyroid carcinoma"
+    ],
+    answer: 1,
+    paper: "Baysal et al. (2000) Science",
+    insight: "SDH mutations cause succinate accumulation — the first oncometabolite, though the term didn't yet exist. Succinate inhibits PHDs (stabilizing HIF-1α) and TET enzymes (causing epigenetic silencing). This paper came 9 years before IDH/2-HG and opened the entire oncometabolite field."
+  },
+  {
+    q: "Shimazu et al. (2013, Science) showed that β-hydroxybutyrate (BHB) — a ketone body produced during fasting — directly inhibits class I and II HDACs at physiologically relevant concentrations. What is the epigenetic and functional consequence?",
+    options: [
+      "Histone hypoacetylation → silencing of metabolic gene programs to reduce OXPHOS during fasting",
+      "Histone hyperacetylation → upregulation of FOXO3a targets including oxidative stress resistance and longevity genes (Mt2, Catalase)",
+      "Increased H3K27me3 → repression of glycolytic gene programs, diverting cells to FAO",
+      "BHB directly acetylates histones without requiring HDAC inhibition, bypassing acetyltransferases"
+    ],
+    answer: 1,
+    paper: "Shimazu et al. (2013) Science",
+    insight: "BHB accumulates during fasting, exercise, or ketogenic diet and acts as an endogenous HDAC inhibitor. This provides a molecular explanation for why caloric restriction is protective — your mitochondria signal to chromatin via a metabolite. BHB is simultaneously a fuel and a transcriptional regulator."
+  },
+  {
+    q: "Kazak et al. (2015, Cell) discovered that brown adipocytes can generate heat independent of UCP1 via a mitochondrial mechanism. What is this futile cycle and why does it produce heat?",
+    options: [
+      "GLUT4 cycles glucose in and out of the cell, consuming ATP at the plasma membrane",
+      "Mitochondrial creatine kinase (CKMT) cycles creatine → phosphocreatine → creatine, with ATP hydrolysis and resynthesis generating heat as a thermodynamic byproduct",
+      "SERCA pumps Ca²⁺ into the ER and it leaks back out continuously, consuming ATP as heat",
+      "Complex V runs in reverse under cold conditions, hydrolyzing ATP to pump protons outward"
+    ],
+    answer: 1,
+    paper: "Kazak et al. (2015) Cell",
+    insight: "In UCP1-knockout mice, this creatine futile cycle — driven by CKMT1/CKMT2 at the inner membrane — maintains thermogenic capacity. The cycle 'wastes' phosphoryl transfer energy as heat. This explains how UCP1-KO mice survive cold and suggests mammals evolved redundant thermogenic mechanisms."
+  },
+  {
+    q: "Ducker et al. (2016, Cell Metabolism) showed that cytoplasmic and mitochondrial folate pathways are not redundant — they serve distinct but complementary roles. When cytoplasmic SHMT1 is blocked, what do mitochondria export to rescue nucleotide synthesis?",
+    options: [
+      "Serine — exported and directly used by nuclear SHMT for thymidylate synthesis",
+      "Formate — produced by mitochondrial SHMT2/MTHFD2, exported to the cytoplasm as a one-carbon unit for de novo purine and thymidylate synthesis",
+      "5-methylTHF — the active one-carbon carrier exported via a dedicated folate transporter",
+      "Glycine — which runs cytoplasmic SHMT1 in the reverse (serine-producing) direction"
+    ],
+    answer: 1,
+    paper: "Ducker et al. (2016) Cell Metabolism; Yang et al. (2016) Mol Cell",
+    insight: "Mitochondria are the primary one-carbon factory in proliferating cells. SHMT2 (mitochondrial) is consistently overexpressed in aggressive cancers. The formate export model explains why mitochondrial one-carbon flux is essential even when cytoplasmic SHMT1 is intact — they operate as a supply chain, not alternatives."
+  },
+  {
+    q: "Brunelle et al. and Guzy et al. (both 2005) showed that mitochondria actively generate the signal for HIF-1α stabilization under hypoxia. This was counterintuitive because oxygen is lower, yet what happens?",
+    options: [
+      "ATP depletion activates AMPK, which phosphorylates and stabilizes HIF-1α directly",
+      "Complex III generates superoxide/ROS that oxidize and inactivate PHD prolyl hydroxylases, preventing HIF-1α hydroxylation and degradation — even though oxygen is scarce",
+      "Cytochrome c released from cristae under hypoxia directly co-activates HIF transcription factors",
+      "Succinate accumulation under hypoxia product-inhibits PHDs, stabilizing HIF-1α"
+    ],
+    answer: 1,
+    paper: "Brunelle et al. (2005) Cell; Guzy et al. (2005) Cell Metabolism",
+    insight: "Less oxygen paradoxically produces more mitochondrial ROS — because electron flow slows, electrons back up at Complex III and leak to O₂ as superoxide. These ROS disable PHDs, which require O₂ as co-substrate anyway. Mitochondria thus function as a cellular oxygen sensor that signals to the nucleus via redox chemistry."
+  }
+];
+
+const TOTAL = QUESTIONS.length;
+
+const state = {
+  screen: "intro",
+  questions: [],
+  current: 0,
+  selected: null,
+  revealed: false,
+  score: 0,
+  answers: [],
+  timeLeft: 30,
+  timerActive: false,
+  darkMode: true,
+  autoReveal: false,
+  timerId: null
+};
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function buildCursor() {
+  try {
+    const W = 40, H = 24, cx = 20, cy = 12;
+    const canvas = document.createElement("canvas");
+    canvas.width = W;
+    canvas.height = H;
+    const c = canvas.getContext("2d");
+    const ep = (rx, ry) => { c.beginPath(); c.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2); };
+    ep(19, 11); c.fillStyle = "#fb923c"; c.fill();
+    ep(19, 11); c.strokeStyle = "#7c2d12"; c.lineWidth = 1.2; c.stroke();
+    ep(15.5, 8); c.fillStyle = "#9a3412"; c.globalAlpha = 0.45; c.fill(); c.globalAlpha = 1;
+    ep(13.5, 6.5); c.fillStyle = "#fed7aa"; c.fill();
+    c.save(); ep(13.5, 6.5); c.clip(); c.fillStyle = "#ea580c";
+    [[9,6,3,5],[15,5,3,6],[21,5,3,6],[27,6,3,5]].forEach(([x,y,w,h]) => { c.beginPath(); c.roundRect(x,y,w,h,1.5); c.fill(); });
+    [[12,13,3,5],[18,13,3,6],[24,13,3,5]].forEach(([x,y,w,h]) => { c.beginPath(); c.roundRect(x,y,w,h,1.5); c.fill(); });
+    c.restore();
+    ep(13.5, 6.5); c.strokeStyle = "#c2410c"; c.lineWidth = 1; c.stroke();
+    const dataUrl = canvas.toDataURL("image/png");
+    const style = document.createElement("style");
+    style.textContent = `*, *::before, *::after { cursor: url('${dataUrl}') 20 12, auto !important; }`;
+    document.head.appendChild(style);
+    document.body.style.cursor = `url('${dataUrl}') 20 12, auto`;
+  } catch (e) {
+    console.warn("Mito cursor failed", e);
+  }
+}
+
+function timerColor() {
+  if (state.timeLeft > 15) return "var(--correct)";
+  if (state.timeLeft > 8) return "#facc15";
+  return "var(--wrong)";
+}
+
+function getScoreLabel() {
+  const pct = state.score / TOTAL;
+  if (pct === 1) return "Flawless. You know your mitochondria.";
+  if (pct >= 0.8) return "Excellent — you've been reading the right papers.";
+  if (pct >= 0.6) return "Solid foundation. A few gems to follow up on.";
+  if (pct >= 0.4) return "Good effort. Time to revisit the Youle lab canon.";
+  return "Mitochondria are more complex than they appear. Time to dig in.";
+}
+
+function setTheme() {
+  document.body.classList.toggle("dark", state.darkMode);
+  document.body.classList.toggle("light", !state.darkMode);
+  document.getElementById("theme-toggle").textContent = state.darkMode ? "☀️" : "🌙";
+}
+
+function startQuiz() {
+  const q = shuffle(QUESTIONS).map((question) => {
+    const indexed = question.options.map((opt, i) => ({ opt, correct: i === question.answer }));
+    const shuffled = shuffle(indexed);
+    return { ...question, options: shuffled.map((x) => x.opt), answer: shuffled.findIndex((x) => x.correct) };
+  });
+  state.questions = q;
+  state.screen = "quiz";
+  state.current = 0;
+  state.selected = null;
+  state.revealed = false;
+  state.score = 0;
+  state.answers = [];
+  state.timeLeft = 30;
+  state.timerActive = true;
+  beginTimer();
+  render();
+}
+
+function beginTimer() {
+  clearInterval(state.timerId);
+  if (!state.timerActive || state.revealed || state.screen !== "quiz") return;
+  state.timerId = setInterval(() => {
+    if (state.timeLeft <= 1) {
+      clearInterval(state.timerId);
+      state.timeLeft = 0;
+      state.timerActive = false;
+      if (state.autoReveal && !state.revealed) {
+        state.revealed = true;
+        state.answers.push({ correct: false, selected: null });
+      }
+      render();
+      return;
+    }
+    state.timeLeft -= 1;
+    render();
+  }, 1000);
+}
+
+function handleSelect(idx) {
+  if (state.revealed) return;
+  clearInterval(state.timerId);
+  state.timerActive = false;
+  state.selected = idx;
+  state.revealed = true;
+  const correct = idx === state.questions[state.current].answer;
+  if (correct) state.score += 1;
+  state.answers.push({ correct, selected: idx });
+  render();
+}
+
+function nextQuestion() {
+  if (state.current + 1 >= state.questions.length) {
+    state.screen = "result";
+    clearInterval(state.timerId);
+  } else {
+    state.current += 1;
+    state.selected = null;
+    state.revealed = false;
+    state.timeLeft = 30;
+    state.timerActive = true;
+    beginTimer();
+  }
+  render();
+}
+
+function revealTimeoutAnswer() {
+  if (state.revealed) return;
+  state.revealed = true;
+  state.answers.push({ correct: false, selected: null });
+  render();
+}
+
+function introView() {
+  return `
+    <section class="intro">
+      <div class="eyebrow">Lab Meeting · Mitochondria Series</div>
+      <h1>The Mitochondria:<br><span style="color:var(--accent)">${TOTAL} Papers That Rewired Biology</span></h1>
+      <p class="subtitle muted">From cristae architecture to innate immunity, from ferroptosis defense to T cell fate — each question anchored to a paper that changed how we think. 30 seconds per question.</p>
+      <div class="stats">
+        <div class="stat-card"><div class="value">${TOTAL}</div><div class="label muted">Questions</div></div>
+        <div class="stat-card"><div class="value">30s</div><div class="label muted">Per question</div></div>
+        <div class="stat-card"><div class="value">Cell · Nature · Science</div><div class="label muted">Primary sources</div></div>
+      </div>
+      <div style="display:flex;justify-content:center;align-items:center;gap:12px;margin-bottom:28px;flex-wrap:wrap;">
+        <button id="toggle-auto" class="button" style="text-transform:none;letter-spacing:0;border:${state.autoReveal ? "1px solid #facc15" : "1px solid #888"};color:${state.autoReveal ? "#facc15" : "#888"};background:${state.autoReveal ? "rgba(250,204,21,0.1)" : "transparent"};">Auto-reveal on timeout: ${state.autoReveal ? "ON" : "OFF"}</button>
+        <span class="muted" style="font-size:12px;max-width:260px;">${state.autoReveal ? "Timer reveals answer automatically" : "Timer stops — group discusses first"}</span>
+      </div>
+      <button id="start-btn" class="button button-primary">Start Quiz</button>
+    </section>
+  `;
+}
+
+function quizView() {
+  const q = state.questions[state.current];
+  const pct = (state.timeLeft / 30) * 100;
+  const dots = state.questions.map((_, i) => {
+    let bg = "rgba(127,127,127,0.3)";
+    if (i < state.answers.length) bg = state.answers[i].correct ? "var(--correct)" : "var(--wrong)";
+    if (i === state.current) bg = "var(--accent)";
+    return `<div class="dot" style="background:${bg}"></div>`;
+  }).join("");
+
+  const options = q.options.map((opt, i) => {
+    let border = "";
+    let bg = "";
+    let textColor = "";
+    let badgeBg = "";
+    let badgeColor = "";
+
+    if (state.revealed) {
+      if (i === q.answer) {
+        border = "border:1px solid var(--correct);";
+        bg = "background:rgba(52,211,153,0.08);";
+        textColor = "color:var(--correct);";
+        badgeBg = "background:var(--correct);";
+        badgeColor = "color:#0d0e14;";
+      } else if (i === state.selected) {
+        border = "border:1px solid var(--wrong);";
+        bg = "background:rgba(248,113,113,0.08);";
+        textColor = "color:var(--wrong);";
+        badgeBg = "background:var(--wrong);";
+        badgeColor = "color:white;";
+      }
+    }
+
+    return `<button class="opt" data-opt="${i}" ${state.revealed ? "disabled" : ""} style="${border}${bg}${textColor}">
+      <span class="badge" style="${badgeBg}${badgeColor}">${String.fromCharCode(65 + i)}</span>
+      <span class="opt-text">${opt}</span>
+    </button>`;
+  }).join("");
+
+  return `
+    <section>
+      <div class="timer-row">
+        <div class="muted" style="font-size:14px;letter-spacing:2px;text-transform:uppercase;">${state.current + 1} / ${TOTAL}</div>
+        <div class="timer-value" style="color:${timerColor()}">${state.revealed ? "—" : state.timeLeft + "s"}</div>
+      </div>
+      <div class="progress-track"><div class="progress-fill" style="width:${state.revealed ? 0 : pct}%;background:${timerColor()}"></div></div>
+      <div class="dots">${dots}</div>
+      <div class="q-card"><p class="q-text">${q.q}</p></div>
+      <div class="options">${options}</div>
+      ${state.revealed ? `<div class="insight"><div class="insight-tag">The story behind it</div><p>${q.insight}</p><div class="paper muted">📄 ${q.paper}</div></div>` : ""}
+      ${!state.revealed && state.timeLeft === 0 ? `<button id="reveal-btn" class="button button-warn">Reveal Answer</button>` : ""}
+      ${state.revealed ? `<button id="next-btn" class="button button-ghost">${state.current + 1 < TOTAL ? "Next Question →" : "See Results"}</button>` : ""}
+    </section>
+  `;
+}
+
+function resultView() {
+  const chips = state.answers.map((a, i) => {
+    const border = a.correct ? "var(--correct)" : "var(--wrong)";
+    const text = a.correct ? "var(--correct)" : "var(--wrong)";
+    const bg = a.correct ? "rgba(52,211,153,0.12)" : "rgba(248,113,113,0.12)";
+    return `<div class="answer-chip" style="border:1px solid ${border};color:${text};background:${bg}">${i + 1}</div>`;
+  }).join("");
+
+  return `
+    <section class="result">
+      <div class="eyebrow">Final Score</div>
+      <div class="result-score">${state.score}<span class="muted" style="font-size:38%;">/${TOTAL}</span></div>
+      <p style="font-size:20px;margin-bottom:8px;font-style:italic;">${getScoreLabel()}</p>
+      <p class="muted" style="font-size:15px;margin-bottom:40px;">${Math.round((state.score / TOTAL) * 100)}% correct</p>
+      <div class="result-card">
+        <div class="muted" style="font-size:12px;letter-spacing:3px;text-transform:uppercase;margin-bottom:14px;">Question breakdown</div>
+        <div class="answers">${chips}</div>
+      </div>
+      <button id="restart-btn" class="button button-primary">Play Again (Shuffled)</button>
+      <p style="margin-top:22px;"><a href="index.html" class="muted">← Back to main site</a></p>
+    </section>
+  `;
+}
+
+function bindEvents() {
+  const start = document.getElementById("start-btn");
+  if (start) start.onclick = startQuiz;
+
+  const auto = document.getElementById("toggle-auto");
+  if (auto) auto.onclick = () => { state.autoReveal = !state.autoReveal; render(); };
+
+  document.querySelectorAll("[data-opt]").forEach((el) => {
+    el.onclick = () => handleSelect(Number(el.dataset.opt));
+  });
+
+  const next = document.getElementById("next-btn");
+  if (next) next.onclick = nextQuestion;
+
+  const reveal = document.getElementById("reveal-btn");
+  if (reveal) reveal.onclick = revealTimeoutAnswer;
+
+  const restart = document.getElementById("restart-btn");
+  if (restart) restart.onclick = startQuiz;
+}
+
+function render() {
+  setTheme();
+  const app = document.getElementById("app");
+  if (state.screen === "intro") app.innerHTML = introView();
+  else if (state.screen === "quiz") app.innerHTML = quizView();
+  else app.innerHTML = resultView();
+  bindEvents();
+}
+
+document.getElementById("theme-toggle").addEventListener("click", () => {
+  state.darkMode = !state.darkMode;
+  render();
+});
+
+buildCursor();
+render();
+  </script>
+</body>
+</html>
